@@ -501,5 +501,103 @@ def features_profile(profile_name: str) -> None:
         raise click.Abort()
 
 
+# ============================================================================
+# Initialization Wizard Commands
+# ============================================================================
+
+
+@cli.group()
+def wizard() -> None:
+    """Initialization wizard and project analysis."""
+    pass
+
+
+@wizard.command("init")
+@click.option("--prompt-set", type=click.Choice(["quick", "standard", "comprehensive", "with_generation"]), default="standard")
+def wizard_init(prompt_set: str) -> None:
+    """Run initialization wizard to analyze existing project."""
+    from ai_provenance.wizard.analyzer import InitializationWizard
+
+    try:
+        wizard = InitializationWizard()
+        results = wizard.run_interactive()
+
+        console.print(f"\n[green]✓[/green] Wizard analysis plan created")
+        console.print(f"\nPrompt set: [bold]{prompt_set}[/bold]")
+        console.print(f"Prompts to run: {len(results['prompts_to_run'])}\n")
+
+        for prompt in results['prompts_to_run']:
+            console.print(f"  📝 {prompt['name']}")
+
+        console.print("\n[yellow]Next steps:[/yellow]")
+        console.print("  1. Export prompts: ai-prov wizard export")
+        console.print("  2. Feed prompts to an AI agent (Claude Code, Claude.ai, etc.)")
+        console.print("  3. Save responses: ai-prov wizard apply <responses.json>")
+
+    except Exception as e:
+        console.print(f"[red]✗[/red] Error: {e}")
+        raise click.Abort()
+
+
+@wizard.command("export")
+@click.option("--output", default="init_prompts.json", help="Output file")
+@click.option("--prompt-set", type=click.Choice(["quick", "standard", "comprehensive", "with_generation"]), default="standard")
+def wizard_export(output: str, prompt_set: str) -> None:
+    """Export initialization prompts for AI agent."""
+    from ai_provenance.wizard.analyzer import InitializationWizard
+
+    try:
+        wizard = InitializationWizard()
+        output_file = wizard.export_prompts(output)
+
+        console.print(f"[green]✓[/green] Exported prompts to {output_file}")
+        console.print("\n[bold]Usage with AI agents:[/bold]")
+        console.print("  1. Open the JSON file and copy each prompt")
+        console.print("  2. Feed to Claude Code, Claude.ai, or other AI")
+        console.print("  3. Save responses in same JSON format")
+        console.print("  4. Run: ai-prov wizard apply <responses.json>")
+
+    except Exception as e:
+        console.print(f"[red]✗[/red] Error: {e}")
+        raise click.Abort()
+
+
+@wizard.command("scaffold")
+@click.option("--dry-run", is_flag=True, help="Show what would be created without creating")
+def wizard_scaffold(dry_run: bool) -> None:
+    """Create recommended project structure."""
+    from ai_provenance.wizard.structure import ProjectScaffolder
+
+    try:
+        scaffolder = ProjectScaffolder()
+
+        if dry_run:
+            console.print("[yellow]Dry run - showing what would be created:[/yellow]\n")
+
+        # Create directory structure
+        dirs_created = scaffolder.create_structure(dry_run=dry_run)
+        for dir_msg in dirs_created:
+            console.print(f"  {dir_msg}")
+
+        # Create standard templates
+        console.print("\n[bold]Standard templates:[/bold]")
+        templates_created = scaffolder.create_standards_templates(dry_run=dry_run)
+        for template_msg in templates_created:
+            console.print(f"  {template_msg}")
+
+        if not dry_run:
+            console.print("\n[green]✓[/green] Project structure created")
+            console.print("\n[yellow]Next steps:[/yellow]")
+            console.print("  1. Review .standards/ templates")
+            console.print("  2. Customize for your project")
+            console.print("  3. Run: ai-prov wizard init")
+        else:
+            console.print("\n[yellow]Run without --dry-run to create these files[/yellow]")
+
+    except Exception as e:
+        console.print(f"[red]✗[/red] Error: {e}")
+        raise click.Abort()
+
+
 if __name__ == "__main__":
     cli()
