@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+#
+# AI Provenance commit-msg hook
+# Validates commit messages for proper AI provenance format
+#
+
+set -e
+
+COMMIT_MSG_FILE="$1"
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Check if this is an AI commit
+if echo "$COMMIT_MSG" | grep -q "^\[AI:"; then
+    echo "🤖 AI commit detected, validating metadata..."
+
+    # Validate AI tag format
+    if ! echo "$COMMIT_MSG" | grep -qE "^\[AI:[a-z]+:(high|med|low)\]"; then
+        echo "❌ Error: Invalid AI tag format"
+        echo "Expected: [AI:tool:confidence] where confidence is high, med, or low"
+        echo "Example: [AI:claude:high] feat: add new feature"
+        exit 1
+    fi
+
+    # Check for Trace: if significant commit (feat, fix, refactor)
+    if echo "$COMMIT_MSG" | grep -qE "^\[AI:[^\]]+\] (feat|fix|refactor)"; then
+        if ! echo "$COMMIT_MSG" | grep -q "^Trace:"; then
+            echo "⚠️  Warning: AI commit missing Trace: field"
+            echo "Consider adding: Trace: SPEC-xxx"
+        fi
+    fi
+
+    # Check for Reviewed-by: field
+    if ! echo "$COMMIT_MSG" | grep -q "^Reviewed-by: AI+"; then
+        echo "⚠️  Warning: AI commit missing review"
+        echo "Consider adding: Reviewed-by: AI+your.email@example.com"
+    fi
+
+    echo "✅ AI commit validation passed"
+fi
+
+# Validate conventional commit format (optional)
+if echo "$COMMIT_MSG" | grep -qE "^(\[AI:[^\]]+\] )?(feat|fix|docs|style|refactor|test|chore)"; then
+    echo "✅ Conventional commit format detected"
+fi
+
+exit 0

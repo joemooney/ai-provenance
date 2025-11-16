@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#
+# AI Provenance pre-push hook
+# Ensures AI provenance notes are pushed with commits
+#
+
+set -e
+
+# Get the remote name
+REMOTE="$1"
+URL="$2"
+
+echo "🚀 Pre-push validation for AI provenance..."
+
+# Check if there are any AI commits being pushed
+COMMITS=$(git log @{u}..HEAD --format=%H 2>/dev/null || git log --format=%H)
+
+HAS_AI_COMMITS=false
+for commit in $COMMITS; do
+    MSG=$(git log -1 --format=%B "$commit")
+    if echo "$MSG" | grep -q "^\[AI:"; then
+        HAS_AI_COMMITS=true
+        break
+    fi
+done
+
+if [ "$HAS_AI_COMMITS" = true ]; then
+    echo "📝 AI commits detected, ensuring notes are pushed..."
+
+    # Push ai-provenance notes
+    git push "$REMOTE" refs/notes/ai-provenance 2>/dev/null || {
+        echo "⚠️  Warning: Could not push AI provenance notes"
+        echo "Run: git push $REMOTE refs/notes/ai-provenance"
+    }
+
+    echo "✅ AI provenance notes pushed"
+fi
+
+exit 0

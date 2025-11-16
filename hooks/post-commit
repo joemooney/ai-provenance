@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+#
+# AI Provenance post-commit hook
+# Adds git notes for AI commits
+#
+
+set -e
+
+COMMIT_SHA=$(git rev-parse HEAD)
+COMMIT_MSG=$(git log -1 --format=%B "$COMMIT_SHA")
+
+# Check if this is an AI commit
+if echo "$COMMIT_MSG" | grep -q "^\[AI:"; then
+    echo "📝 Adding AI provenance metadata to git notes..."
+
+    # Extract metadata from commit message
+    AI_TAG=$(echo "$COMMIT_MSG" | grep -oP '^\[AI:\K[^\]]+' || echo "")
+    TOOL=$(echo "$AI_TAG" | cut -d: -f1)
+    CONF=$(echo "$AI_TAG" | cut -d: -f2)
+    TRACE=$(echo "$COMMIT_MSG" | grep "^Trace:" | sed 's/Trace: //' || echo "")
+    TESTS=$(echo "$COMMIT_MSG" | grep "^Test:" | sed 's/Test: //' || echo "")
+    REVIEWER=$(echo "$COMMIT_MSG" | grep "^Reviewed-by:" | sed 's/Reviewed-by: //' || echo "")
+
+    # Get affected files
+    FILES=$(git diff-tree --no-commit-id --name-only -r "$COMMIT_SHA" | tr '\n' ',' | sed 's/,$//')
+
+    # Build JSON metadata
+    METADATA="{"
+    METADATA="$METADATA\"ai_tool\":\"$TOOL\","
+    METADATA="$METADATA\"confidence\":\"$CONF\""
+
+    if [ -n "$TRACE" ]; then
+        # Split trace IDs into array
+        TRACE_ARRAY="["
+        IFS=',' read -ra TRACE_IDS <<< "$TRACE"
+        for i in "${TRACE_IDS[@]}"; do
+            TRACE_ARRAY="$TRACE_ARRAY\"$(echo $i | xargs)\","
+        done
+        TRACE_ARRAY="${TRACE_ARRAY%,}]"
+        METADATA="$METADATA,\"trace\":$TRACE_ARRAY"
+    fi
+
+    if [ -n "$TESTS" ]; then
+        # Split test IDs into array
+        TEST_ARRAY="["
+        IFS=',' read -ra TEST_IDS <<< "$TESTS"
+        for i in "${TEST_IDS[@]}"; do
+            TEST_ARRAY="$TEST_ARRAY\"$(echo $i | xargs)\","
+        done
+        TEST_ARRAY="${TEST_ARRAY%,}]"
+        METADATA="$METADATA,\"tests\":$TEST_ARRAY"
+    fi
+
+    if [ -n "$REVIEWER" ]; then
+        METADATA="$METADATA,\"reviewed_by\":\"$REVIEWER\""
+        METADATA="$METADATA,\"reviewed_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\""
+    fi
+
+    if [ -n "$FILES" ]; then
+        # Convert files to JSON array
+        FILES_ARRAY="["
+        IFS=',' read -ra FILE_LIST <<< "$FILES"
+        for f in "${FILE_LIST[@]}"; do
+            FILES_ARRAY="$FILES_ARRAY\"$f\","
+        done
+        FILES_ARRAY="${FILES_ARRAY%,}]"
+        METADATA="$METADATA,\"files\":$FILES_ARRAY"
+    fi
+
+    METADATA="$METADATA}"
+
+    # Add git note
+    git notes --ref=ai-provenance add -f -m "$METADATA" "$COMMIT_SHA"
+
+    echo "✅ AI provenance metadata added to commit $COMMIT_SHA"
+fi
+
+exit 0

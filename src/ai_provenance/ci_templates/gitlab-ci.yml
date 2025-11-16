@@ -1,0 +1,97 @@
+# AI Provenance GitLab CI Template
+# Add this to your .gitlab-ci.yml
+
+stages:
+  - test
+  - report
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+
+ai-provenance-validation:
+  stage: test
+  image: python:3.11
+  before_script:
+    - pip install ai-provenance
+    - ai-prov init || echo "Already initialized"
+  script:
+    # Validate repository
+    - ai-prov validate --require-review --require-tests
+
+    # Generate metrics
+    - ai-prov query --ai-percent --by-file > ai-metrics.txt
+
+    # Check for unreviewed code
+    - ai-prov query --unreviewed > ai-unreviewed.txt || true
+
+    # Generate traceability matrix
+    - ai-prov trace-matrix --format md > traceability.md
+
+    # Extract AI percentage for reporting
+    - export AI_PERCENT=$(grep "AI-Generated Code:" ai-metrics.txt | awk '{print $3}')
+    - echo "ai_percent=$AI_PERCENT" >> ai-metrics.env
+  artifacts:
+    reports:
+      dotenv: ai-metrics.env
+    paths:
+      - ai-metrics.txt
+      - ai-unreviewed.txt
+      - traceability.md
+    expire_in: 30 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+ai-provenance-report:
+  stage: report
+  image: python:3.11
+  dependencies:
+    - ai-provenance-validation
+  script:
+    - echo "# AI Code Provenance Report" > report.md
+    - echo "" >> report.md
+    - echo "## Metrics" >> report.md
+    - echo "\`\`\`" >> report.md
+    - cat ai-metrics.txt >> report.md
+    - echo "\`\`\`" >> report.md
+    - echo "" >> report.md
+    - echo "## Unreviewed Code" >> report.md
+    - echo "\`\`\`" >> report.md
+    - cat ai-unreviewed.txt >> report.md
+    - echo "\`\`\`" >> report.md
+    - echo "" >> report.md
+    - echo "## Traceability Matrix" >> report.md
+    - cat traceability.md >> report.md
+  artifacts:
+    paths:
+      - report.md
+    expire_in: 30 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Optional: Add MR comment with provenance info
+ai-provenance-mr-comment:
+  stage: report
+  image: python:3.11
+  dependencies:
+    - ai-provenance-validation
+  script:
+    - |
+      if [ -n "$CI_MERGE_REQUEST_IID" ]; then
+        COMMENT="## 🤖 AI Code Provenance Report\n\n"
+        COMMENT="$COMMENT\`\`\`\n$(cat ai-metrics.txt)\n\`\`\`\n\n"
+
+        # Post comment using GitLab API
+        curl --request POST \
+          --header "PRIVATE-TOKEN: $CI_JOB_TOKEN" \
+          --data "body=$COMMENT" \
+          "$CI_API_V4_URL/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes"
+      fi
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  allow_failure: true
