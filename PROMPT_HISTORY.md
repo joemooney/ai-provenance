@@ -508,3 +508,243 @@ git commit -m "[AI:claude:high] fix: import Any in wizard/structure.py..."
 2. Add mypy to CI/CD pipeline to catch type annotation errors
 3. Run full test suite to ensure no regressions
 4. Consider adding pre-commit hooks for type checking
+
+## Session 3: IEEE-830 Requirements Template Integration (2025-11-16)
+
+### Context
+User provided a battle-tested IEEE-830 requirement template (from /tmp/zz) and asked how it meshes with the existing ai-provenance requirements system.
+
+### Analysis
+
+Compared the IEEE-830 template with existing system:
+- **Current**: JSON files in `.ai-prov/requirements/` (machine-first) + basic Markdown in `specs/requirements/`
+- **Template**: Comprehensive IEEE-830 Markdown with YAML front-matter (human-first + machine-parsable)
+
+**Integration Strategy**: Two-tier architecture
+1. `specs/requirements/*.md` - Source of truth (human-readable IEEE-830)
+2. `.ai-prov/requirements/*.json` - Derived data (machine-processable)
+
+### Implementation
+
+#### 1. Created IEEE-830 Template
+
+**File**: `src/ai_provenance/requirements/templates/ieee830.md`
+
+Structure includes:
+- YAML front-matter (id, version, status, priority, ai metadata, reviewers, parent, tags)
+- 9 comprehensive sections:
+  1. Requirement Statement
+  2. Rationale
+  3. Source
+  4. Fit Criterion (Verification) - with test case table
+  5. Dependencies
+  6. Assumptions
+  7. Risks & Mitigations
+  8. Open Issues
+  9. Change History
+
+#### 2. Built Conversion Utilities
+
+**File**: `src/ai_provenance/requirements/templates.py`
+
+Functions:
+- `parse_yaml_frontmatter()` - Extract YAML from Markdown
+- `markdown_to_requirement()` - Convert MD → Pydantic Requirement object
+- `requirement_to_markdown()` - Convert Requirement → IEEE-830 MD
+- `sync_markdown_to_json()` - Bulk sync MD → JSON
+- `sync_json_to_markdown()` - Bulk sync JSON → MD
+
+**Key Features**:
+- Regex-based section extraction
+- Status mapping (Draft → planned, etc.)
+- Test case extraction from fit criterion table
+- Dependency extraction from section 5
+
+#### 3. Enhanced CLI Commands
+
+**Modified**: `ai-prov requirement create`
+
+Added options:
+- `--template` - Specify template (ieee830, simple)
+- `--ai-tool` - AI tool that generated requirement
+- `--ai-confidence` - Confidence level (high, med, low)
+- `--parent` - Parent requirement/epic ID
+
+Now generates both JSON and Markdown when `--template` specified.
+
+**New**: `ai-prov requirement show`
+
+Options:
+- `--format` - Output format (text, json, md)
+
+Shows requirement details in specified format.
+
+**New**: `ai-prov requirement sync`
+
+Options:
+- `--md-to-json` - Sync Markdown → JSON (default)
+- `--json-to-md` - Sync JSON → Markdown
+- `--template` - Template for JSON → MD sync
+- `--quiet` - Suppress output
+
+Bidirectional synchronization between formats.
+
+#### 4. Created Pre-Commit Hook
+
+**File**: `hooks/pre-commit`
+
+Auto-syncs Markdown requirements to JSON before commit:
+- Detects ai-prov in venv or system
+- Syncs specs/requirements/*.md → .ai-prov/requirements/*.json
+- Auto-stages updated JSON files
+- Fails gracefully if ai-prov not available
+
+#### 5. Added Dependencies
+
+**Modified**: `pyproject.toml`
+
+Added `pyyaml>=6.0.0` for YAML front-matter parsing.
+
+#### 6. Created Comprehensive Documentation
+
+**File**: `docs/REQUIREMENTS_WORKFLOW.md`
+
+Complete workflow guide including:
+- Two-tier architecture explanation
+- Template structure and benefits
+- JSON format details
+- Complete workflow examples
+- Synchronization strategies
+- Best practices
+- CLI command reference
+- Migration guide from other systems
+- Compliance mapping (DO-178C, ASPICE, IEEE-830)
+- Future enhancements
+
+#### 7. Bug Fixes
+
+Fixed additional `any` → `Any` type annotation in:
+- `src/ai_provenance/requirements/manager.py` (line 181)
+
+### Testing
+
+Created test requirement:
+```bash
+ai-prov requirement create SPEC-TEST-001 \
+  --title "Test Requirement with Template" \
+  --description "..." \
+  --template ieee830 \
+  --ai-tool claude \
+  --ai-confidence high \
+  --priority high \
+  --parent EPIC-001
+```
+
+Results:
+✅ JSON created: `.ai-prov/requirements/SPEC-TEST-001.json`
+✅ Markdown created: `specs/requirements/SPEC-TEST-001.md`
+✅ YAML front-matter properly formatted
+✅ IEEE-830 template structure applied
+✅ Show command displays all fields
+✅ Sync command works (MD → JSON and JSON → MD)
+✅ List command shows all requirements
+
+### Files Modified/Created
+
+**Created**:
+1. src/ai_provenance/requirements/templates/ieee830.md
+2. src/ai_provenance/requirements/templates.py
+3. docs/REQUIREMENTS_WORKFLOW.md
+4. hooks/pre-commit
+
+**Modified**:
+1. pyproject.toml (added pyyaml dependency)
+2. src/ai_provenance/cli/main.py (3 enhanced/new commands)
+3. src/ai_provenance/requirements/manager.py (type annotation fix)
+
+### Git Operations
+
+```bash
+# Commit 1: Template and utilities
+git add docs/REQUIREMENTS_WORKFLOW.md pyproject.toml \
+  src/ai_provenance/requirements/manager.py \
+  src/ai_provenance/requirements/templates.py \
+  src/ai_provenance/requirements/templates/ieee830.md
+git commit -m "[AI:claude:high] feat: add IEEE-830 requirements template..."
+
+# Commit 2: CLI commands and pre-commit hook
+git add src/ai_provenance/cli/main.py hooks/pre-commit
+git commit -m "[AI:claude:high] feat: add CLI commands and pre-commit hook..."
+
+# Commit 3: Documentation update
+git add PROMPT_HISTORY.md
+git commit -m "[AI:claude:high] docs: add Session 3 to PROMPT_HISTORY.md..."
+```
+
+### Key Benefits
+
+✅ **Human + Machine** - Edit Markdown, query JSON
+✅ **Compliance-Ready** - IEEE-830, DO-178C, ASPICE compatible
+✅ **Git-Friendly** - Excellent diffs with Markdown
+✅ **Traceable** - Built-in links to tests, files, commits
+✅ **AI-Aware** - Full AI provenance metadata
+✅ **Backward Compatible** - Existing JSON system still works
+✅ **Automated Sync** - Pre-commit hook keeps formats in sync
+
+### Integration with /tmp/zz Template
+
+| Feature | /tmp/zz | ai-provenance |
+|---------|---------|---------------|
+| YAML front-matter | ✅ | ✅ Implemented |
+| 9-section structure | ✅ | ✅ Full template |
+| Fit criterion table | ✅ | ✅ Auto-extracts tests |
+| Dependencies | ✅ | ✅ Bidirectional links |
+| Risks & mitigations | ✅ | ✅ In template |
+| Change history | ✅ | ✅ In template |
+| AI provenance | ⚠️ Basic | ✅ Enhanced |
+| Traceability | ⚠️ Manual | ✅ Automated |
+| CI validation | ⚠️ Example | ✅ Built-in |
+| JSON export | ❌ | ✅ Auto-sync |
+| Pre-commit hook | ❌ | ✅ Auto-sync |
+
+### Example Workflow
+
+```bash
+# 1. Create with template
+ai-prov requirement create SPEC-0200 \
+  --title "Rate limiting for API" \
+  --description "Implement token bucket rate limiter" \
+  --priority high \
+  --template ieee830
+
+# 2. Edit Markdown (add details)
+vim specs/requirements/SPEC-0200.md
+
+# 3. Auto-sync on commit (pre-commit hook)
+git add specs/requirements/SPEC-0200.md
+git commit -m "feat: add rate limiting requirement"
+# → Pre-commit hook syncs MD → JSON automatically
+
+# 4. Query using JSON
+ai-prov requirement show SPEC-0200
+ai-prov requirement list --status planned
+```
+
+### Outcomes
+
+✅ Complete two-tier requirements system
+✅ IEEE-830 template integrated
+✅ CLI commands for create, show, sync
+✅ Pre-commit hook for auto-sync
+✅ Comprehensive documentation
+✅ Full traceability maintained
+✅ Backward compatible with existing system
+
+### Next Steps
+
+1. Add CI validation for requirements (check YAML validity)
+2. Create additional templates (simple, agile user story, etc.)
+3. Add requirement dependency graph visualization
+4. Implement requirement coverage reports
+5. Add import/export for Jira, Linear, GitHub Issues
+6. Create web dashboard for requirements browsing
