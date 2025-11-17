@@ -22,13 +22,126 @@
 - 🚀 **CI/CD Integration**: Ready-to-use GitHub Actions and GitLab CI templates
 - 📦 **Zero Dependencies**: All data stored in Git repo, no external databases
 
-## Quick Start
+## Getting Started
 
 ### Installation
+
+#### For Development/Testing
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/ai-provenance
+cd ai-provenance
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install in development mode
+pip install -e ".[dev]"
+
+# Verify installation
+ai-prov --version
+```
+
+#### From PyPI (when published)
 
 ```bash
 pip install ai-provenance
 ```
+
+### Quick Start - Hello World Tutorial
+
+**Complete tutorial:** See [hello-world-provenance/TUTORIAL.md](../hello-world-provenance/TUTORIAL.md)
+
+#### 1. Create a new project
+
+```bash
+mkdir my-project
+cd my-project
+git init
+```
+
+#### 2. Initialize AI Provenance
+
+```bash
+# Initialize tracking
+ai-prov init
+
+# Apply a feature profile
+ai-prov features profile standard
+
+# Create recommended structure (optional)
+ai-prov wizard scaffold
+```
+
+#### 3. Create a requirement
+
+```bash
+ai-prov requirement create SPEC-001 \
+  --title "Hello World Program" \
+  --description "Create a simple greeting program"
+```
+
+#### 4. Write code with metadata
+
+Create `hello.py`:
+```python
+# ai:claude:high | trace:SPEC-001 | test:TC-001
+def greet(name: str = "World") -> str:
+    """Greet someone by name."""
+    return f"Hello, {name}!"
+```
+
+#### 5. Link code to requirement
+
+```bash
+ai-prov requirement link SPEC-001 --file hello.py
+```
+
+#### 6. Store the prompt (optional)
+
+```bash
+ai-prov prompt store \
+  --file hello.py \
+  --prompt "Create a simple greeting function" \
+  --trace SPEC-001 \
+  --test TC-001
+```
+
+#### 7. Commit with provenance
+
+```bash
+git add hello.py .ai-prov/
+ai-prov commit -m "feat: add greeting function" \
+  --tool claude --conf high \
+  --trace SPEC-001 --test TC-001
+```
+
+#### 8. Generate reports
+
+```bash
+# Check AI percentage
+ai-prov query --ai-percent
+
+# View file report
+ai-prov report hello.py
+
+# Generate traceability matrix
+ai-prov trace-matrix
+```
+
+### Example Project
+
+A complete working example is available in `/home/joe/ai/hello-world-provenance/`
+
+```bash
+cd /home/joe/ai/hello-world-provenance
+cat TUTORIAL.md  # Step-by-step guide
+python3 hello.py  # Run the example
+```
+
+## Detailed Usage
 
 ### Initialize Repository
 
