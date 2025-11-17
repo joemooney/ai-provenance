@@ -625,10 +625,12 @@ You are helping the user implement a requirement following AI provenance best pr
    - Show the plan to the user and get approval
 
 4. **Implement the code:**
-   - Create source files with:
-     - Proper AI provenance inline tags: `# ai:claude:high | trace:SPEC-XXX`
-     - Clean, documented code
-     - Type hints (Python) or proper typing (other languages)
+   - Create ALL files with AI provenance tags at the top:
+     - Source files: `# ai:claude:high | trace:SPEC-XXX`
+     - Supporting files (.gitignore, __init__.py, etc.): same tags
+     - IMPORTANT: Every file you create must be tagged, not just main files
+   - Write clean, documented code
+   - Use type hints (Python) or proper typing (other languages)
    - Follow coding standards from `.standards/CODING_STANDARDS.md` if present
 
 5. **Create comprehensive tests:**

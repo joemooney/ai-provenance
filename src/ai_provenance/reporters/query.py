@@ -62,6 +62,10 @@ def _query_ai_percentage(repo: git.Repo, by_file: bool) -> str:
         if not full_path.exists() or not full_path.is_file():
             continue
 
+        # Skip .ai-prov directory (metadata, not code)
+        if file_path.startswith(".ai-prov/"):
+            continue
+
         # Count total lines
         try:
             lines = full_path.read_text().split("\n")
