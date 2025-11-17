@@ -3,7 +3,7 @@ Recommended project structure and scaffolding.
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 import json
 
 
