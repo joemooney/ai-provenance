@@ -599,6 +599,103 @@ ai-prov stamp src/auth.py \\
 Guide the user through adding provenance metadata to their AI-generated code.
 """
 
+COMMAND_IMPLEMENT = """# Implement AI Provenance Requirement
+
+You are helping the user implement a requirement following AI provenance best practices.
+
+**Instructions:**
+
+1. **Ask which requirement to implement:**
+   - Use AskUserQuestion to get the requirement ID (e.g., SPEC-001)
+   - Or ask if they want to see the list first
+
+2. **Read the requirement:**
+   - Run: `ai-prov requirement show <REQ_ID> --format json`
+   - Parse the requirement details (title, description, type, priority)
+
+3. **Create an implementation plan:**
+   - Based on the requirement, propose:
+     - Source files to create
+     - Test files to create
+     - Documentation to add
+   - Show the plan to the user and get approval
+
+4. **Implement the code:**
+   - Create source files with:
+     - Proper AI provenance inline tags: `# ai:claude:high | trace:SPEC-XXX`
+     - Clean, documented code
+     - Type hints (Python) or proper typing (other languages)
+   - Follow coding standards from `.standards/CODING_STANDARDS.md` if present
+
+5. **Create comprehensive tests:**
+   - Create test files with:
+     - AI provenance tags: `# ai:claude:high | trace:SPEC-XXX | test:TC-XXX`
+     - Unit tests covering happy path and edge cases
+     - Clear test names and docstrings
+   - Place in appropriate test directory (tests/unit/, tests/integration/)
+
+6. **Link to requirement:**
+   - Run: `ai-prov requirement link SPEC-XXX --file <source_file>`
+   - Run: `ai-prov requirement link SPEC-XXX --test TC-XXX`
+
+7. **Commit with provenance:**
+   - Stage all created files
+   - Create commit with proper format:
+     ```
+     [AI:claude:high] <type>: <subject>
+
+     <body>
+
+     Trace: SPEC-XXX
+     Test: TC-XXX
+     ```
+
+8. **Show summary:**
+   - List files created
+   - Show requirement status
+   - Suggest next steps (run tests, create another requirement, etc.)
+
+**Best Practices to Follow:**
+
+- **Traceability**: Every file must link back to a requirement
+- **Testing**: Write tests before or alongside implementation
+- **Documentation**: Add docstrings and comments explaining WHY, not WHAT
+- **AI Transparency**: Tag all AI-generated code with provenance metadata
+- **Atomic commits**: One requirement per commit when possible
+
+**Example Workflow:**
+
+```bash
+# Read requirement
+ai-prov requirement show SPEC-001 --format json
+
+# Create implementation files (you do this with Write tool)
+# src/hello.py with proper tags
+
+# Link to requirement
+ai-prov requirement link SPEC-001 --file src/hello.py
+
+# Commit
+git add src/hello.py tests/unit/test_hello.py
+git commit -m "[AI:claude:high] feat: implement hello world greeting
+
+Implemented greeting function per SPEC-001.
+
+Trace: SPEC-001
+Test: TC-001"
+```
+
+**Important Notes:**
+
+- Always read the requirement first to understand what to build
+- Ask clarifying questions if the requirement is unclear
+- Create tests that verify all acceptance criteria
+- Use the TodoWrite tool to track implementation steps
+- Be thorough and follow all best practices from `.standards/`
+
+Guide the user through each step and ensure they understand the provenance workflow.
+"""
+
 
 class ProjectScaffolder:
     """Create recommended project structure."""
@@ -707,6 +804,7 @@ See `.standards/` for coding standards and conventions.
 
         commands = {
             ".claude/commands/req.md": COMMAND_REQ,
+            ".claude/commands/implement.md": COMMAND_IMPLEMENT,
             ".claude/commands/trace.md": COMMAND_TRACE,
             ".claude/commands/stamp.md": COMMAND_STAMP,
         }
@@ -732,6 +830,6 @@ See `.standards/` for coding standards and conventions.
                 for v in RECOMMENDED_STRUCTURE.values()
             ),
             "templates": 4,
-            "commands": 3,
+            "commands": 4,
             "description": "Recommended AI-provenance project structure",
         }
