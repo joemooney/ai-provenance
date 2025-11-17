@@ -64,6 +64,13 @@ RECOMMENDED_STRUCTURE = {
             "CONVENTIONS.md": "Naming and organizational conventions",
         },
     },
+    # Claude Code integration
+    ".claude/": {
+        "description": "Claude Code configuration and commands",
+        "contents": {
+            "commands/": "Slash commands for Claude Code",
+        },
+    },
 }
 
 
@@ -506,6 +513,92 @@ TEMPLATE_REVIEW_CHECKLIST = """# Code Review Checklist
 - [ ] Branch is up to date with main
 """
 
+# ============================================================================
+# CLAUDE CODE SLASH COMMANDS
+# ============================================================================
+
+COMMAND_REQ = """# Create AI Provenance Requirement
+
+You are helping the user create a new requirement for AI Provenance tracking.
+
+**Instructions:**
+1. Use the AskUserQuestion tool to collect the following information:
+   - Requirement ID (e.g., SPEC-001, SPEC-002)
+   - Title (brief summary)
+   - Description (detailed description)
+   - Type (feature, bug, enhancement, documentation)
+   - Priority (critical, high, medium, low)
+
+2. After collecting the information, run the ai-prov requirement create command with the collected data
+
+3. Show the user the created requirement and ask if they want to create another one
+
+**Example:**
+```bash
+ai-prov requirement create SPEC-001 \\
+  --title "Hello World Program" \\
+  --description "Create a simple program that greets the user" \\
+  --type feature \\
+  --priority high
+```
+
+Be friendly and guide the user through the process step by step.
+"""
+
+COMMAND_TRACE = """# Link Code to Requirement
+
+You are helping the user link code to a requirement for traceability.
+
+**Instructions:**
+1. Use the AskUserQuestion tool to collect:
+   - Requirement ID to link to
+   - What to link (file, commit, or test)
+   - The path/ID to link
+
+2. Run the appropriate ai-prov requirement link command
+
+3. Confirm the link was created successfully
+
+**Example:**
+```bash
+ai-prov requirement link SPEC-001 --file src/hello.py
+ai-prov requirement link SPEC-001 --commit abc123
+ai-prov requirement link SPEC-001 --test TC-001
+```
+
+Be helpful and confirm the traceability link was established.
+"""
+
+COMMAND_STAMP = """# Stamp AI Metadata on Code
+
+You are helping the user add AI provenance metadata to a code file.
+
+**Instructions:**
+1. Use the AskUserQuestion tool to collect:
+   - File path to stamp
+   - AI tool used (claude, copilot, chatgpt, etc.)
+   - Confidence level (high, med, low)
+   - Optional: Requirement IDs (trace)
+   - Optional: Test case IDs (test)
+   - Optional: Reviewer email
+
+2. Run the ai-prov stamp command with the collected data
+
+3. Show the user the stamped file and confirm success
+
+**Example:**
+```bash
+ai-prov stamp src/auth.py \\
+  --tool claude \\
+  --conf high \\
+  --trace SPEC-089 \\
+  --test TC-210 \\
+  --reviewer alice@example.com
+```
+
+Guide the user through adding provenance metadata to their AI-generated code.
+"""
+
 
 class ProjectScaffolder:
     """Create recommended project structure."""
@@ -608,6 +701,27 @@ See `.standards/` for coding standards and conventions.
 
         return readme_addition
 
+    def create_claude_commands(self, dry_run: bool = False) -> List[str]:
+        """Create Claude Code slash commands."""
+        created = []
+
+        commands = {
+            ".claude/commands/req.md": COMMAND_REQ,
+            ".claude/commands/trace.md": COMMAND_TRACE,
+            ".claude/commands/stamp.md": COMMAND_STAMP,
+        }
+
+        for file_path, content in commands.items():
+            full_path = self.repo_path / file_path
+
+            if not dry_run:
+                full_path.parent.mkdir(parents=True, exist_ok=True)
+                full_path.write_text(content)
+
+            created.append(f"Created command: {file_path}")
+
+        return created
+
     def get_structure_summary(self) -> Dict[str, Any]:
         """Get summary of recommended structure."""
         return {
@@ -618,5 +732,6 @@ See `.standards/` for coding standards and conventions.
                 for v in RECOMMENDED_STRUCTURE.values()
             ),
             "templates": 4,
+            "commands": 3,
             "description": "Recommended AI-provenance project structure",
         }

@@ -717,12 +717,22 @@ def wizard_scaffold(dry_run: bool) -> None:
         for template_msg in templates_created:
             console.print(f"  {template_msg}")
 
+        # Create Claude Code slash commands
+        console.print("\n[bold]Claude Code slash commands:[/bold]")
+        commands_created = scaffolder.create_claude_commands(dry_run=dry_run)
+        for command_msg in commands_created:
+            console.print(f"  {command_msg}")
+
         if not dry_run:
             console.print("\n[green]✓[/green] Project structure created")
             console.print("\n[yellow]Next steps:[/yellow]")
             console.print("  1. Review .standards/ templates")
             console.print("  2. Customize for your project")
             console.print("  3. Run: ai-prov wizard init")
+            console.print("\n[bold]Claude Code integration:[/bold]")
+            console.print("  • Use /req to create requirements interactively")
+            console.print("  • Use /trace to link code to requirements")
+            console.print("  • Use /stamp to add AI metadata to files")
         else:
             console.print("\n[yellow]Run without --dry-run to create these files[/yellow]")
 
