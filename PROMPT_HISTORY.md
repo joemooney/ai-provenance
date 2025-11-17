@@ -397,3 +397,114 @@ This session successfully created a complete, distributable AI provenance tracki
 5. Community feedback and iteration
 
 The foundation is solid, extensible, and follows best practices for Python CLI tools and Git integration.
+
+## Session 2: Type Annotation Bug Fixes (2025-11-16)
+
+### Context
+User attempted to run the `ai-prov features profile standard` command and encountered a Pydantic schema generation error due to incorrect type annotations.
+
+### Issue 1: features.py Type Annotation Error
+
+**Error**:
+```
+pydantic.errors.PydanticSchemaGenerationError: Unable to generate pydantic-core schema for <built-in function any>
+```
+
+**Root Cause**:
+Line 59 in `src/ai_provenance/core/features.py` used `any` (built-in function) instead of `Any` (typing type):
+```python
+config: Dict[str, any] = Field(default_factory=dict)
+```
+
+**Solution**:
+1. Added `Any` to typing imports on line 9
+2. Changed `any` to `Any` on line 59
+
+**Files Modified**:
+- src/ai_provenance/core/features.py
+
+**Testing**:
+```bash
+venv/bin/ai-prov features profile standard
+# Output: Successfully applied 'standard' profile with 7 enabled features
+```
+
+**Commit**: `8d53f35` - [AI:claude:high] fix: use typing.Any instead of built-in any in FeatureConfig
+
+### Issue 2: structure.py Type Annotation Error
+
+**User Command**: `ai-prov wizard scaffold`
+
+**Error**:
+```
+NameError: name 'Any' is not defined. Did you mean: 'any'?
+```
+
+**Root Cause**:
+Line 611 in `src/ai_provenance/wizard/structure.py` used `Any` in type annotation but didn't import it:
+```python
+def get_structure_summary(self) -> Dict[str, Any]:
+```
+
+The file only imported `Dict, List, Optional` but not `Any`.
+
+**Solution**:
+Added `Any` to typing imports on line 6
+
+**Files Modified**:
+- src/ai_provenance/wizard/structure.py
+
+**Testing**:
+```bash
+venv/bin/ai-prov wizard scaffold
+# Output: Successfully created project structure with directories and templates
+```
+
+**Commit**: `555645a` - [AI:claude:high] fix: import Any in wizard/structure.py
+
+### Verification
+
+Searched all Python files for missing `Any` imports:
+- wizard/analyzer.py: ✅ Already imports Any
+- prompts/models.py: ✅ Already imports Any
+- requirements/models.py: ✅ Already imports Any
+- git_integration/notes.py: ✅ Already imports Any
+
+No other files have missing `Any` imports.
+
+### Technical Details
+
+**Pattern**: Missing `Any` import from `typing` module
+**Impact**: Pydantic schema generation fails at import time
+**Prevention**: Add mypy type checking to CI/CD pipeline
+
+### Git Operations
+
+```bash
+git add src/ai_provenance/core/features.py
+git commit -m "[AI:claude:high] fix: use typing.Any instead of built-in any in FeatureConfig..."
+
+git add src/ai_provenance/wizard/structure.py
+git commit -m "[AI:claude:high] fix: import Any in wizard/structure.py..."
+```
+
+**Note**: Push failed due to no configured remote repository
+
+### Files Modified
+
+1. src/ai_provenance/core/features.py (2 lines changed)
+2. src/ai_provenance/wizard/structure.py (1 line changed)
+
+### Outcomes
+
+✅ `ai-prov features profile` command working
+✅ `ai-prov wizard scaffold` command working
+✅ No remaining `Any` import issues found
+✅ Both fixes committed with proper AI provenance tags
+
+### Next Steps
+
+1. Configure git remote for pushing to GitHub
+2. Add mypy to CI/CD pipeline to catch type annotation errors
+3. Run full test suite to ensure no regressions
+4. Consider adding pre-commit hooks for type checking
