@@ -78,16 +78,17 @@ def _install_hooks(repo_root: Path, verbose: bool) -> None:
 
 def _configure_filters(repo: git.Repo, verbose: bool) -> None:
     """Configure git filter driver for .meta.json generation."""
-    config = repo.config_writer()
-
-    # Add filter driver
-    config.set_value('filter "ai-meta"', "clean", "ai-prov-filter clean")
-    config.set_value('filter "ai-meta"', "smudge", "ai-prov-filter smudge")
-
-    config.release()
+    # TODO: Filter driver not yet implemented
+    # Skipping configuration to avoid "ai-prov-filter: not found" errors
+    # with git blame, git diff, etc.
+    #
+    # config = repo.config_writer()
+    # config.set_value('filter "ai-meta"', "clean", "ai-prov-filter clean")
+    # config.set_value('filter "ai-meta"', "smudge", "ai-prov-filter smudge")
+    # config.release()
 
     if verbose:
-        print("  ✓ Configured git filter driver")
+        print("  ⊘ Skipped git filter driver (not yet implemented)")
 
 
 def _init_notes_namespace(repo: git.Repo, verbose: bool) -> None:
@@ -108,6 +109,12 @@ def _configure_gitattributes(repo_root: Path, verbose: bool) -> None:
     """
     Create or update .gitattributes for auto-metadata generation.
     """
+    # TODO: Filter driver not yet implemented, skipping .gitattributes configuration
+    # to avoid "ai-prov-filter: not found" errors
+    if verbose:
+        print("  ⊘ Skipped .gitattributes (filter driver not yet implemented)")
+    return
+
     gitattributes = repo_root / ".gitattributes"
 
     # Default file patterns to track
