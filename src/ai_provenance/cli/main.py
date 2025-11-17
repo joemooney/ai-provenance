@@ -145,16 +145,21 @@ def report(file: str, rev: str, format: str) -> None:
 
 
 @cli.command()
+@click.argument("paths", nargs=-1, type=click.Path())
 @click.option("--ai-percent", is_flag=True, help="Show % of AI-generated code")
 @click.option("--by-file", is_flag=True, help="Break down by file")
 @click.option("--unreviewed", is_flag=True, help="Find unreviewed AI code")
 @click.option("--trace", type=str, help="Find code for a requirement (e.g., SPEC-123)")
-def query(ai_percent: bool, by_file: bool, unreviewed: bool, trace: str | None) -> None:
+def query(paths: tuple, ai_percent: bool, by_file: bool, unreviewed: bool, trace: str | None) -> None:
     """
     Query repository for AI code metrics.
 
+    PATHS: Optional file(s) or directory(ies) to query (default: entire repo)
+
     Examples:
         ai-prov query --ai-percent --by-file
+        ai-prov query --ai-percent src/hello.py
+        ai-prov query --ai-percent src/ tests/
         ai-prov query --unreviewed
         ai-prov query --trace SPEC-89
     """
@@ -166,6 +171,7 @@ def query(ai_percent: bool, by_file: bool, unreviewed: bool, trace: str | None) 
             by_file=by_file,
             unreviewed=unreviewed,
             trace=trace,
+            paths=list(paths) if paths else None,
         )
         console.print(result)
     except Exception as e:

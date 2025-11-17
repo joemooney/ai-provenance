@@ -18,6 +18,7 @@ def run_query(
     by_file: bool = False,
     unreviewed: bool = False,
     trace: Optional[str] = None,
+    paths: Optional[List[str]] = None,
     repo_path: Optional[str] = None,
 ) -> str:
     """
@@ -28,6 +29,7 @@ def run_query(
         by_file: Break down metrics by file
         unreviewed: Find unreviewed AI code
         trace: Find code for a requirement
+        paths: Optional list of file/directory paths to filter
         repo_path: Path to repository (default: current directory)
 
     Returns:
@@ -36,7 +38,7 @@ def run_query(
     repo = git.Repo(repo_path or ".", search_parent_directories=True)
 
     if ai_percent:
-        return _query_ai_percentage(repo, by_file)
+        return _query_ai_percentage(repo, by_file, paths)
     elif unreviewed:
         return _query_unreviewed(repo)
     elif trace:
@@ -45,12 +47,25 @@ def run_query(
         return "No query specified. Use --ai-percent, --unreviewed, or --trace"
 
 
-def _query_ai_percentage(repo: git.Repo, by_file: bool) -> str:
+def _query_ai_percentage(repo: git.Repo, by_file: bool, paths: Optional[List[str]] = None) -> str:
     """Calculate % of AI-generated code."""
     repo_root = Path(repo.working_dir)
 
     # Get all tracked files
     tracked_files = repo.git.ls_files().split("\n")
+
+    # Filter by paths if provided
+    if paths:
+        filtered_files = []
+        for path_filter in paths:
+            path_filter = Path(path_filter)
+            for file_path in tracked_files:
+                file_full = Path(file_path)
+                # Match if file is under the path or is the exact file
+                if file_full == path_filter or path_filter in file_full.parents or str(file_full).startswith(str(path_filter)):
+                    if file_path not in filtered_files:
+                        filtered_files.append(file_path)
+        tracked_files = filtered_files
 
     total_lines = 0
     ai_lines = 0
