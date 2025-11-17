@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# AI Provenance pre-commit hook
+# Auto-sync requirements from Markdown to JSON
+
+set -e
+
+# Check if ai-prov is available
+if ! command -v ai-prov &> /dev/null; then
+    # Try to find it in virtual environment
+    if [ -f "venv/bin/ai-prov" ]; then
+        AI_PROV="venv/bin/ai-prov"
+    elif [ -f ".venv/bin/ai-prov" ]; then
+        AI_PROV=".venv/bin/ai-prov"
+    else
+        # Skip if ai-prov not found
+        exit 0
+    fi
+else
+    AI_PROV="ai-prov"
+fi
+
+# Check if specs/requirements/ has any Markdown files
+if [ -d "specs/requirements" ] && [ -n "$(find specs/requirements -name 'SPEC-*.md' -print -quit)" ]; then
+    echo "🔄 Auto-syncing requirements (Markdown → JSON)..."
+
+    # Sync Markdown to JSON
+    if $AI_PROV requirement sync --md-to-json --quiet 2>/dev/null; then
+        # Stage any updated JSON files
+        git add .ai-prov/requirements/*.json 2>/dev/null || true
+        echo "✓ Requirements synced"
+    else
+        echo "⚠️  Warning: Failed to sync requirements (continuing anyway)"
+    fi
+fi
+
+exit 0

@@ -67,12 +67,30 @@ def markdown_to_requirement(md_path: Path) -> Requirement:
     description = desc_match.group(1).strip() if desc_match else ''
 
     # Map YAML to Requirement fields
+    # Handle status mapping (Draft → draft, In Progress → in-progress, etc.)
+    status_raw = metadata.get('status', 'planned')
+    if isinstance(status_raw, str):
+        status_normalized = status_raw.lower().replace(' ', '-')
+        # Map common variations
+        status_map = {
+            'draft': 'planned',
+            'in-progress': 'in-progress',
+            'in progress': 'in-progress',
+            'implemented': 'implemented',
+            'tested': 'tested',
+            'verified': 'verified',
+            'deprecated': 'deprecated',
+        }
+        status_normalized = status_map.get(status_normalized, status_normalized)
+    else:
+        status_normalized = 'planned'
+
     req = Requirement(
         id=metadata.get('id', md_path.stem),
         title=title,
         description=description,
-        type=RequirementType(metadata.get('type', 'feature')),
-        status=RequirementStatus(metadata.get('status', 'planned').lower().replace(' ', '-')),
+        type=RequirementType(metadata.get('type', 'feature').lower()),
+        status=RequirementStatus(status_normalized),
         priority=RequirementPriority(metadata.get('priority', 'medium').lower()),
         created_by=metadata.get('authors', [None])[0] if metadata.get('authors') else None,
         parent=metadata.get('parent'),
