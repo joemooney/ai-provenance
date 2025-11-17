@@ -4,7 +4,7 @@ Requirements management system.
 
 import json
 from pathlib import Path
-from typing import List, Optional, Dict
+from typing import Any, List, Optional, Dict
 
 from ai_provenance.requirements.models import (
     Requirement,
@@ -178,7 +178,7 @@ class RequirementManager:
         data = json.loads(test_file.read_text())
         return TestCase(**data)
 
-    def get_coverage(self, req_id: str) -> Dict[str, any]:
+    def get_coverage(self, req_id: str) -> Dict[str, Any]:
         """Get test coverage for a requirement."""
         requirement = self.get_requirement(req_id)
 
