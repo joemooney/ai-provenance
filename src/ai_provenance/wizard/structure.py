@@ -530,7 +530,7 @@ You are helping the user create a new requirement for AI Provenance tracking.
    - Priority (critical, high, medium, low)
 
 2. After collecting the information, run the ai-prov requirement create command with the collected data
-   - Always include --template simple to create both JSON and Markdown formats
+   - Always include --template ieee830 to create both JSON and Markdown formats
    - This creates machine-readable JSON in .ai-prov/requirements/
    - And human-readable Markdown in specs/requirements/
 
@@ -543,7 +543,7 @@ ai-prov requirement create SPEC-001 \\
   --description "Create a simple program that greets the user" \\
   --type feature \\
   --priority high \\
-  --template simple
+  --template ieee830
 ```
 
 Be friendly and guide the user through the process step by step.
