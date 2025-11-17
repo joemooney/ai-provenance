@@ -6,7 +6,7 @@ Allows enabling/disabling features during initialization and runtime.
 
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 import json
 
 from pydantic import BaseModel, Field
@@ -56,7 +56,7 @@ class FeatureConfig(BaseModel):
     status: FeatureStatus = FeatureStatus.STABLE
     description: str
     dependencies: List[Feature] = Field(default_factory=list)
-    config: Dict[str, any] = Field(default_factory=dict)
+    config: Dict[str, Any] = Field(default_factory=dict)
 
     class Config:
         json_schema_extra = {
