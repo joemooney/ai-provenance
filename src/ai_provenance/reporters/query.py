@@ -10,7 +10,7 @@ from typing import Dict, List, Optional
 import git
 
 from ai_provenance.git_integration.notes import get_ai_commits
-from ai_provenance.parsers.stamper import parse_inline_metadata
+from ai_provenance.parsers.stamper import parse_inline_metadata, find_ai_hunks
 
 
 def run_query(
@@ -68,9 +68,10 @@ def _query_ai_percentage(repo: git.Repo, by_file: bool) -> str:
             file_total = len(lines)
             total_lines += file_total
 
-            # Count AI lines from inline metadata
-            metadata = parse_inline_metadata(str(full_path))
-            file_ai = sum(1 for _ in metadata)  # Simplified: each metadata line counts
+            # Count AI lines from inline metadata hunks
+            hunks = find_ai_hunks(str(full_path))
+            # Count total lines in all AI hunks (end - start + 1 for each hunk)
+            file_ai = sum(end - start + 1 for start, end, _ in hunks)
             ai_lines += file_ai
 
             if by_file:
