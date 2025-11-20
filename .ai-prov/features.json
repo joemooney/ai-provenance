@@ -1,0 +1,253 @@
+{
+  "features": {
+    "core_tracking": {
+      "name": "core_tracking",
+      "enabled": true,
+      "status": "stable",
+      "description": "Core metadata tracking functionality",
+      "dependencies": [],
+      "config": {}
+    },
+    "git_notes": {
+      "name": "git_notes",
+      "enabled": true,
+      "status": "stable",
+      "description": "Git notes integration for immutable metadata",
+      "dependencies": [
+        "core_tracking"
+      ],
+      "config": {}
+    },
+    "inline_metadata": {
+      "name": "inline_metadata",
+      "enabled": true,
+      "status": "stable",
+      "description": "Inline comment-based metadata",
+      "dependencies": [
+        "core_tracking"
+      ],
+      "config": {}
+    },
+    "requirements": {
+      "name": "requirements",
+      "enabled": true,
+      "status": "beta",
+      "description": "Requirements management and traceability",
+      "dependencies": [
+        "core_tracking"
+      ],
+      "config": {
+        "storage": "json",
+        "auto_link": true
+      }
+    },
+    "test_traceability": {
+      "name": "test_traceability",
+      "enabled": true,
+      "status": "beta",
+      "description": "Test case tracking and coverage",
+      "dependencies": [
+        "core_tracking"
+      ],
+      "config": {}
+    },
+    "prompts": {
+      "name": "prompts",
+      "enabled": false,
+      "status": "alpha",
+      "description": "Store prompts used to generate code",
+      "dependencies": [
+        "core_tracking"
+      ],
+      "config": {
+        "storage": ".ai-prov/prompts",
+        "encrypt": false
+      }
+    },
+    "conversations": {
+      "name": "conversations",
+      "enabled": false,
+      "status": "alpha",
+      "description": "Log full AI conversations",
+      "dependencies": [
+        "prompts"
+      ],
+      "config": {
+        "storage": ".ai-prov/conversations",
+        "format": "json"
+      }
+    },
+    "auto_detection": {
+      "name": "auto_detection",
+      "enabled": false,
+      "status": "alpha",
+      "description": "Automatically detect AI-generated code",
+      "dependencies": [
+        "core_tracking"
+      ],
+      "config": {
+        "confidence_threshold": 0.7
+      }
+    },
+    "file_metadata": {
+      "name": "file_metadata",
+      "enabled": false,
+      "status": "alpha",
+      "description": "Generate .meta.json files automatically",
+      "dependencies": [
+        "core_tracking"
+      ],
+      "config": {}
+    },
+    "web_dashboard": {
+      "name": "web_dashboard",
+      "enabled": false,
+      "status": "alpha",
+      "description": "Web-based dashboard for visualization",
+      "dependencies": [
+        "core_tracking",
+        "metrics"
+      ],
+      "config": {
+        "port": 5100,
+        "host": "localhost"
+      }
+    },
+    "ide_integration": {
+      "name": "ide_integration",
+      "enabled": false,
+      "status": "alpha",
+      "description": "IDE extensions and integrations",
+      "dependencies": [
+        "core_tracking"
+      ],
+      "config": {}
+    },
+    "ci_validation": {
+      "name": "ci_validation",
+      "enabled": true,
+      "status": "stable",
+      "description": "CI/CD validation and gates",
+      "dependencies": [
+        "core_tracking"
+      ],
+      "config": {}
+    },
+    "team_features": {
+      "name": "team_features",
+      "enabled": false,
+      "status": "alpha",
+      "description": "Multi-user collaboration features",
+      "dependencies": [
+        "core_tracking"
+      ],
+      "config": {}
+    },
+    "audit_trail": {
+      "name": "audit_trail",
+      "enabled": false,
+      "status": "beta",
+      "description": "Enhanced audit and compliance features",
+      "dependencies": [
+        "core_tracking",
+        "git_notes"
+      ],
+      "config": {}
+    },
+    "regeneration": {
+      "name": "regeneration",
+      "enabled": false,
+      "status": "alpha",
+      "description": "Project regeneration from metadata",
+      "dependencies": [
+        "prompts",
+        "conversations",
+        "requirements"
+      ],
+      "config": {}
+    },
+    "api_server": {
+      "name": "api_server",
+      "enabled": false,
+      "status": "alpha",
+      "description": "REST API server for integrations",
+      "dependencies": [
+        "core_tracking"
+      ],
+      "config": {
+        "port": 5101,
+        "host": "localhost"
+      }
+    },
+    "metrics": {
+      "name": "metrics",
+      "enabled": true,
+      "status": "stable",
+      "description": "Advanced metrics and analytics",
+      "dependencies": [
+        "core_tracking"
+      ],
+      "config": {}
+    }
+  },
+  "profiles": {
+    "minimal": [
+      "core_tracking",
+      "git_notes",
+      "inline_metadata"
+    ],
+    "standard": [
+      "core_tracking",
+      "git_notes",
+      "inline_metadata",
+      "requirements",
+      "test_traceability",
+      "ci_validation",
+      "metrics"
+    ],
+    "full": [
+      "core_tracking",
+      "git_notes",
+      "inline_metadata",
+      "requirements",
+      "test_traceability",
+      "prompts",
+      "conversations",
+      "auto_detection",
+      "ci_validation",
+      "metrics",
+      "audit_trail"
+    ],
+    "team": [
+      "core_tracking",
+      "git_notes",
+      "inline_metadata",
+      "requirements",
+      "test_traceability",
+      "ci_validation",
+      "team_features",
+      "web_dashboard",
+      "metrics",
+      "audit_trail"
+    ],
+    "research": [
+      "core_tracking",
+      "git_notes",
+      "inline_metadata",
+      "prompts",
+      "conversations",
+      "metrics",
+      "auto_detection"
+    ],
+    "regeneration": [
+      "core_tracking",
+      "git_notes",
+      "inline_metadata",
+      "requirements",
+      "test_traceability",
+      "prompts",
+      "conversations",
+      "regeneration"
+    ]
+  }
+}
