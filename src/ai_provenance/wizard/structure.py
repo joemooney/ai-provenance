@@ -517,34 +517,52 @@ TEMPLATE_REVIEW_CHECKLIST = """# Code Review Checklist
 # CLAUDE CODE SLASH COMMANDS
 # ============================================================================
 
-COMMAND_REQ = """# Create AI Provenance Requirement
+COMMAND_REQ = """# Create Requirement with requirements-manager
 
-You are helping the user create a new requirement for AI Provenance tracking.
+You are helping the user create a new requirement using requirements-manager.
 
 **Instructions:**
 1. Use the AskUserQuestion tool to collect the following information:
-   - Requirement ID (e.g., SPEC-001, SPEC-002)
    - Title (brief summary)
    - Description (detailed description)
-   - Type (feature, bug, enhancement, documentation)
-   - Priority (critical, high, medium, low)
+   - Feature name (e.g., Authentication, Core, UI)
+   - Priority (Critical, High, Medium, Low)
+   - Status (Draft, InProgress, Completed, Verified)
 
-2. After collecting the information, run the ai-prov requirement create command with the collected data
-   - Always include --template ieee830 to create both JSON and Markdown formats
-   - This creates machine-readable JSON in .ai-prov/requirements/
-   - And human-readable Markdown in specs/requirements/
+2. After collecting the information, run the requirements-manager add command
+   - This creates the requirement in requirements.yaml
+   - It automatically generates a UUID and assigns a SPEC-ID
 
-3. Show the user the created requirement and ask if they want to create another one
+3. Then run requirements-manager export to update the mapping:
+   ```bash
+   requirements-manager export --format mapping
+   ```
+
+4. Show the user the created requirement (with SPEC-ID) and ask if they want to create another one
 
 **Example:**
 ```bash
-ai-prov requirement create SPEC-001 \\
+# Create requirement
+requirements-manager add \\
   --title "Hello World Program" \\
   --description "Create a simple program that greets the user" \\
-  --type feature \\
-  --priority high \\
-  --template ieee830
+  --feature Core \\
+  --priority High \\
+  --status Draft
+
+# Output: Created requirement with UUID abc-123... (SPEC-001)
+
+# Update mapping file
+requirements-manager export --format mapping
+
+# Output: ✓ Generated mapping file: .requirements-mapping.yaml
 ```
+
+**Notes:**
+- requirements-manager is the ONLY way to create requirements
+- SPEC-IDs are auto-generated from UUIDs
+- The mapping file (.requirements-mapping.yaml) links UUIDs to SPEC-IDs
+- ai-provenance reads directly from requirements.yaml for traceability
 
 Be friendly and guide the user through the process step by step.
 """
@@ -614,8 +632,9 @@ You are helping the user implement a requirement following AI provenance best pr
    - Or ask if they want to see the list first
 
 2. **Read the requirement:**
-   - Run: `ai-prov requirement show <REQ_ID> --format json`
-   - Parse the requirement details (title, description, type, priority)
+   - Run: `requirements-manager show <SPEC_ID>` to see full requirement details
+   - Parse the requirement details (title, description, feature, priority, status)
+   - Note: SPEC-IDs are in the mapping file (.requirements-mapping.yaml)
 
 3. **Create an implementation plan:**
    - Based on the requirement, propose:
@@ -640,9 +659,10 @@ You are helping the user implement a requirement following AI provenance best pr
      - Clear test names and docstrings
    - Place in appropriate test directory (tests/unit/, tests/integration/)
 
-6. **Link to requirement:**
-   - Run: `ai-prov requirement link SPEC-XXX --file <source_file>`
-   - Run: `ai-prov requirement link SPEC-XXX --test TC-XXX`
+6. **Link via git commit:**
+   - Linking happens automatically via commit metadata
+   - The Trace: SPEC-XXX in commit messages creates the traceability link
+   - No separate link command needed (requirements-manager integration)
 
 7. **Commit with provenance:**
    - Stage all created files
@@ -672,16 +692,13 @@ You are helping the user implement a requirement following AI provenance best pr
 **Example Workflow:**
 
 ```bash
-# Read requirement
-ai-prov requirement show SPEC-001 --format json
+# Read requirement from requirements-manager
+requirements-manager show SPEC-001
 
 # Create implementation files (you do this with Write tool)
-# src/hello.py with proper tags
+# src/hello.py with proper tags: # ai:claude:high | trace:SPEC-001
 
-# Link to requirement
-ai-prov requirement link SPEC-001 --file src/hello.py
-
-# Commit
+# Commit with traceability (this creates the link)
 git add src/hello.py tests/unit/test_hello.py
 git commit -m "[AI:claude:high] feat: implement hello world greeting
 
@@ -689,6 +706,9 @@ Implemented greeting function per SPEC-001.
 
 Trace: SPEC-001
 Test: TC-001"
+
+# Optionally update requirement status in requirements-manager
+requirements-manager edit <uuid> --status Completed
 ```
 
 **Important Notes:**
