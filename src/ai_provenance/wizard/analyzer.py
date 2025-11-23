@@ -187,25 +187,34 @@ class InitializationWizard:
         return output_path
 
     def apply_analysis_results(self, results: Dict[str, Any]) -> List[str]:
-        """Apply analysis results to initialize the project."""
-        from ai_provenance.requirements.manager import RequirementManager
-        from ai_provenance.requirements.models import RequirementType, RequirementPriority
+        """
+        Apply analysis results to initialize the project.
+
+        NOTE: This feature is currently disabled pending requirements-manager integration.
+        Use requirements-manager CLI to create requirements from analysis results.
+        """
+        # TODO: Update to use requirements-manager CLI instead of old RequirementManager
+        # See docs/REQUIREMENTS_MANAGER_INTEGRATION.md for details
 
         actions = []
-        manager = RequirementManager(self.repo_path)
 
-        # Create requirements from features
+        # Placeholder: Would create requirements using requirements-manager
+        # For now, just save analysis results for manual processing
         if "features" in results:
-            for feature in results["features"]:
-                req = manager.create_requirement(
-                    req_id=feature.get("id", f"FEAT-{len(actions):03d}"),
-                    title=feature.get("name", "Untitled Feature"),
-                    description=feature.get("description", ""),
-                    req_type=RequirementType.FEATURE,
-                    priority=RequirementPriority.MEDIUM,
-                )
+            actions.append(f"Found {len(results['features'])} features - use requirements-manager to create them")
 
-                # Link files
+        # Create requirements from features (DISABLED - old code)
+        # if "features" in results:
+        #     for feature in results["features"]:
+        #         req = manager.create_requirement(
+        #             req_id=feature.get("id", f"FEAT-{len(actions):03d}"),
+        #             title=feature.get("name", "Untitled Feature"),
+        #             description=feature.get("description", ""),
+        #             req_type=RequirementType.FEATURE,
+        #             priority=RequirementPriority.MEDIUM,
+        #         )
+
+                # Link files (DISABLED - old code)
                 for file in feature.get("files", []):
                     manager.link_file(req.id, file)
 
