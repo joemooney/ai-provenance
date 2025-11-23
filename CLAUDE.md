@@ -201,6 +201,13 @@ All metadata uses Pydantic models for validation. See `core/models.py` for schem
 
 Historical metadata is reconstructed by reading git notes at specific revisions. Use `git show <rev>:file.meta.json` for file-level metadata.
 
+### Documentation and Help
+- **User guide HTML generation**: Generate HTML versions of user guides from markdown sources
+- **Dark mode support**: Provide both light and dark mode versions of documentation
+- **Browser viewing**: Open user guides in default browser with mode selection
+- **Pre-generated files**: Commit generated HTML files to repository for browser refresh capability
+- **Helper scripts**: Provide scripts in helper directory for regenerating documentation
+
 ## Future Enhancements
 
 1. **Filter driver**: Implement ai-prov-filter for auto .meta.json generation
