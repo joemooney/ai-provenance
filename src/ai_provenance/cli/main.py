@@ -519,6 +519,7 @@ def wizard_scaffold(dry_run: bool) -> None:
             console.print("  • Use /implement to build features from requirements")
             console.print("  • Use /trace to link code to requirements")
             console.print("  • Use /stamp to add AI metadata to files")
+            console.print("  • Use /doc to generate and manage documentation")
         else:
             console.print("\n[yellow]Run without --dry-run to create these files[/yellow]")
 

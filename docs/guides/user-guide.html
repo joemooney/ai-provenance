@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Guide - AI Provenance</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #24292e;
+            --code-bg: #f6f8fa;
+            --border: #e1e4e8;
+            --link: #0366d6;
+            --heading: #24292e;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0d1117;
+                --text: #c9d1d9;
+                --code-bg: #161b22;
+                --border: #30363d;
+                --link: #58a6ff;
+                --heading: #c9d1d9;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--heading);
+            margin: 1.5rem 0 1rem;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.3rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.3rem;
+        }
+
+        h3 { font-size: 1.25rem; }
+
+        p {
+            margin: 1rem 0;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 85%;
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        a {
+            color: var(--link);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--border);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text);
+            opacity: 0.8;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--code-bg);
+            font-weight: 600;
+        }
+
+        .toc {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 2rem 0;
+        }
+
+        .toc-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <nav style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+        <a href="index.html">Home</a> |
+        <a href="user-guide.html">User Guide</a> |
+        <a href="../api/index.html">API Docs</a>
+    </nav>
+    <h1 id="ai-provenance">AI Provenance</h1>
+<p><strong>Git-native AI code provenance and metadata tracking system</strong></p>
+<p><a href="https://opensource.org/licenses/MIT"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a><br />
+<a href="https://www.python.org/downloads/"><img alt="Python 3.8+" src="https://img.shields.io/badge/python-3.8+-blue.svg" /></a></p>
+<h2 id="overview">Overview</h2>
+<p><code>ai-provenance</code> is a comprehensive, language-agnostic tool for tracking, attributing, and auditing AI-generated code. It provides hierarchical metadata management (line → block → function → file level) using Git-native mechanisms with full temporal coverage.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>🏷️ <strong>Hierarchical Metadata</strong>: Track AI contributions at line, block, function, and file levels</li>
+<li>📝 <strong>Commit Convention</strong>: Structured, machine-parsable commit messages with AI attribution</li>
+<li>📊 <strong>Git Notes</strong>: Rich metadata stored in Git notes for immutable provenance</li>
+<li>🔍 <strong>Temporal Coverage</strong>: Reconstruct metadata for any historical version</li>
+<li>🔗 <strong>Traceability</strong>: Link code to requirements (SPEC-xxx) and test cases (TC-xxx)</li>
+<li>✅ <strong>Review Tracking</strong>: Record human review of AI-generated code</li>
+<li>📈 <strong>Reporting</strong>: Generate comprehensive reports and metrics</li>
+<li>🔧 <strong>Language Agnostic</strong>: Works with any text-based programming language</li>
+<li>🚀 <strong>CI/CD Integration</strong>: Ready-to-use GitHub Actions and GitLab CI templates</li>
+<li>📦 <strong>Zero Dependencies</strong>: All data stored in Git repo, no external databases</li>
+</ul>
+<h2 id="getting-started">Getting Started</h2>
+<h3 id="installation">Installation</h3>
+<h4 id="for-developmenttesting">For Development/Testing</h4>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Clone the repository</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/your-username/ai-provenance
+<span class="nb">cd</span><span class="w"> </span>ai-provenance
+
+<span class="c1"># Create virtual environment</span>
+python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w">  </span><span class="c1"># On Windows: venv\Scripts\activate</span>
+
+<span class="c1"># Install in development mode</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+
+<span class="c1"># Verify installation</span>
+ai-prov<span class="w"> </span>--version
+</code></pre></div>
+
+<h4 id="from-pypi-when-published">From PyPI (when published)</h4>
+<div class="codehilite"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>ai-provenance
+</code></pre></div>
+
+<h3 id="quick-start-hello-world-tutorial">Quick Start - Hello World Tutorial</h3>
+<p><strong>Complete tutorial:</strong> See <a href="../hello-world-provenance/TUTORIAL.md">hello-world-provenance/TUTORIAL.md</a></p>
+<h4 id="1-create-a-new-project">1. Create a new project</h4>
+<div class="codehilite"><pre><span></span><code>mkdir<span class="w"> </span>my-project
+<span class="nb">cd</span><span class="w"> </span>my-project
+git<span class="w"> </span>init
+</code></pre></div>
+
+<h4 id="2-initialize-ai-provenance">2. Initialize AI Provenance</h4>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Initialize tracking</span>
+ai-prov<span class="w"> </span>init
+
+<span class="c1"># Apply a feature profile</span>
+ai-prov<span class="w"> </span>features<span class="w"> </span>profile<span class="w"> </span>standard
+
+<span class="c1"># Create recommended structure (optional)</span>
+ai-prov<span class="w"> </span>wizard<span class="w"> </span>scaffold
+</code></pre></div>
+
+<h4 id="3-create-a-requirement">3. Create a requirement</h4>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>requirement<span class="w"> </span>create<span class="w"> </span>SPEC-001<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--title<span class="w"> </span><span class="s2">&quot;Hello World Program&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--description<span class="w"> </span><span class="s2">&quot;Create a simple greeting program&quot;</span>
+</code></pre></div>
+
+<h4 id="4-write-code-with-metadata">4. Write code with metadata</h4>
+<p>Create <code>hello.py</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># ai:claude:high | trace:SPEC-001 | test:TC-001</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;World&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Greet someone by name.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">!&quot;</span>
+</code></pre></div>
+
+<h4 id="5-link-code-to-requirement">5. Link code to requirement</h4>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>requirement<span class="w"> </span>link<span class="w"> </span>SPEC-001<span class="w"> </span>--file<span class="w"> </span>hello.py
+</code></pre></div>
+
+<h4 id="6-store-the-prompt-optional">6. Store the prompt (optional)</h4>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>prompt<span class="w"> </span>store<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--file<span class="w"> </span>hello.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--prompt<span class="w"> </span><span class="s2">&quot;Create a simple greeting function&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--trace<span class="w"> </span>SPEC-001<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--test<span class="w"> </span>TC-001
+</code></pre></div>
+
+<h4 id="7-commit-with-provenance">7. Commit with provenance</h4>
+<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>hello.py<span class="w"> </span>.ai-prov/
+ai-prov<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: add greeting function&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--tool<span class="w"> </span>claude<span class="w"> </span>--conf<span class="w"> </span>high<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--trace<span class="w"> </span>SPEC-001<span class="w"> </span>--test<span class="w"> </span>TC-001
+</code></pre></div>
+
+<h4 id="8-generate-reports">8. Generate reports</h4>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Check AI percentage</span>
+ai-prov<span class="w"> </span>query<span class="w"> </span>--ai-percent
+
+<span class="c1"># View file report</span>
+ai-prov<span class="w"> </span>report<span class="w"> </span>hello.py
+
+<span class="c1"># Generate traceability matrix</span>
+ai-prov<span class="w"> </span>trace-matrix
+</code></pre></div>
+
+<h3 id="example-project">Example Project</h3>
+<p>A complete working example is available in <code>/home/joe/ai/hello-world-provenance/</code></p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/home/joe/ai/hello-world-provenance
+cat<span class="w"> </span>TUTORIAL.md<span class="w">  </span><span class="c1"># Step-by-step guide</span>
+python3<span class="w"> </span>hello.py<span class="w">  </span><span class="c1"># Run the example</span>
+</code></pre></div>
+
+<h2 id="detailed-usage">Detailed Usage</h2>
+<h3 id="initialize-repository">Initialize Repository</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>your-project
+ai-prov<span class="w"> </span>init
+</code></pre></div>
+
+<p>This sets up:<br />
+- Git hooks for automatic metadata tracking<br />
+- Filter driver for <code>.meta.json</code> generation<br />
+- Git notes namespace for provenance data</p>
+<h3 id="stamp-code-with-ai-metadata">Stamp Code with AI Metadata</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Add inline metadata to a file</span>
+ai-prov<span class="w"> </span>stamp<span class="w"> </span>src/auth.py<span class="w"> </span>--tool<span class="w"> </span>claude<span class="w"> </span>--conf<span class="w"> </span>high<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--trace<span class="w"> </span>SPEC-89<span class="w"> </span>--test<span class="w"> </span>TC-210<span class="w"> </span>--reviewer<span class="w"> </span>alice@example.com
+</code></pre></div>
+
+<h3 id="commit-with-provenance">Commit with Provenance</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Structured commit with full metadata</span>
+ai-prov<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat(auth): add JWT refresh endpoint&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--tool<span class="w"> </span>claude<span class="w"> </span>--conf<span class="w"> </span>high<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--trace<span class="w"> </span>SPEC-89<span class="w"> </span>--test<span class="w"> </span>TC-210,TC-211
+</code></pre></div>
+
+<p>This generates a commit message:</p>
+<div class="codehilite"><pre><span></span><code><span class="o">[</span><span class="n">AI:claude:high</span><span class="o">]</span><span class="w"> </span><span class="n">feat</span><span class="p">(</span><span class="n">auth</span><span class="p">)</span><span class="err">:</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="n">JWT</span><span class="w"> </span><span class="n">refresh</span><span class="w"> </span><span class="n">endpoint</span>
+<span class="nl">Trace</span><span class="p">:</span><span class="w"> </span><span class="n">SPEC</span><span class="o">-</span><span class="mi">89</span>
+<span class="nl">Test</span><span class="p">:</span><span class="w"> </span><span class="n">TC</span><span class="o">-</span><span class="mi">210</span><span class="p">,</span><span class="w"> </span><span class="n">TC</span><span class="o">-</span><span class="mi">211</span>
+<span class="n">Reviewed</span><span class="o">-</span><span class="k">by</span><span class="err">:</span><span class="w"> </span><span class="n">AI</span><span class="o">+</span><span class="n">alice</span><span class="nv">@example</span><span class="p">.</span><span class="n">com</span>
+</code></pre></div>
+
+<h3 id="generate-reports">Generate Reports</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># File-level report with full history</span>
+ai-prov<span class="w"> </span>report<span class="w"> </span>src/auth.py
+
+<span class="c1"># Repository-wide metrics</span>
+ai-prov<span class="w"> </span>query<span class="w"> </span>--ai-percent<span class="w"> </span>--by-file
+
+<span class="c1"># Find unreviewed AI code</span>
+ai-prov<span class="w"> </span>query<span class="w"> </span>--unreviewed
+
+<span class="c1"># Traceability matrix</span>
+ai-prov<span class="w"> </span>trace-matrix<span class="w"> </span>&gt;<span class="w"> </span>TRACEABILITY.md
+</code></pre></div>
+
+<h2 id="metadata-schema">Metadata Schema</h2>
+<p><code>ai-provenance</code> tracks metadata at multiple levels:</p>
+<h3 id="commit-level-git-notes">Commit Level (Git Notes)</h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;ai_tool&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;trace&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;SPEC-89&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;tests&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;TC-210&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;reviewed_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alice@example.com&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;reviewed_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-11-16T14:00:00Z&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h3 id="file-level-metajson">File Level (<code>.meta.json</code>)</h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;src/auth.py&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;generated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-11-16T13:38:00Z&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;ai_tool&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;trace&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;SPEC-89&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;tests&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;TC-210&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TC-211&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;reviewed_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alice@example.com&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;blocks&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;function&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;refresh_token&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;lines&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="mi">68</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;ai&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h3 id="line-level-inline-comments">Line Level (Inline Comments)</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># ai:claude:high | trace:SPEC-89 | test:TC-210 | reviewed:2025-11-16:alice</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">refresh_token</span><span class="p">(</span><span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="c1"># AI-generated implementation</span>
+    <span class="o">...</span>
+</code></pre></div>
+
+<h2 id="commands">Commands</h2>
+<h3 id="ai-prov-init"><code>ai-prov init</code></h3>
+<p>Initialize provenance tracking in a repository.</p>
+<h3 id="ai-prov-stamp-file"><code>ai-prov stamp &lt;file&gt;</code></h3>
+<p>Add AI metadata inline comments to a file.</p>
+<p><strong>Options:</strong><br />
+- <code>--tool</code>: AI tool used (claude, copilot, chatgpt, etc.)<br />
+- <code>--conf</code>: Confidence level (high, med, low)<br />
+- <code>--trace</code>: Requirements/specs (SPEC-123)<br />
+- <code>--test</code>: Test cases (TC-456)<br />
+- <code>--reviewer</code>: Human reviewer email</p>
+<h3 id="ai-prov-commit"><code>ai-prov commit</code></h3>
+<p>Create a commit with structured provenance metadata.</p>
+<h3 id="ai-prov-report-file-rev-commit"><code>ai-prov report &lt;file&gt; [--rev &lt;commit&gt;]</code></h3>
+<p>Generate a comprehensive metadata report for a file.</p>
+<h3 id="ai-prov-query"><code>ai-prov query</code></h3>
+<p>Query repository for AI code metrics.</p>
+<p><strong>Options:</strong><br />
+- <code>--ai-percent</code>: Show % of AI-generated code<br />
+- <code>--by-file</code>: Break down by file<br />
+- <code>--unreviewed</code>: Find unreviewed AI code<br />
+- <code>--trace &lt;spec&gt;</code>: Find code for a requirement</p>
+<h3 id="ai-prov-validate"><code>ai-prov validate</code></h3>
+<p>Validate repository metadata integrity.</p>
+<p><strong>Options:</strong><br />
+- <code>--require-review</code>: Ensure all AI code is reviewed<br />
+- <code>--require-tests</code>: Ensure all traced code has tests</p>
+<h3 id="ai-prov-trace-matrix"><code>ai-prov trace-matrix</code></h3>
+<p>Generate a traceability matrix (features → code → tests).</p>
+<h2 id="cicd-integration">CI/CD Integration</h2>
+<h3 id="github-actions">GitHub Actions</h3>
+<div class="codehilite"><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AI Provenance Check</span>
+<span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pull_request</span><span class="p p-Indicator">]</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">provenance</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> fetch-depth</span><span class="p">:</span><span class="w"> </span><span class="nv">0</span><span class="w"> </span><span class="p p-Indicator">}</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install ai-provenance</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install ai-provenance</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Validate AI metadata</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ai-prov validate --require-review --require-tests</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate PR comment</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ai-prov report --pr-comment &gt;&gt; $GITHUB_STEP_SUMMARY</span>
+</code></pre></div>
+
+<h3 id="gitlab-ci">GitLab CI</h3>
+<div class="codehilite"><pre><span></span><code><span class="nt">ai-provenance</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+<span class="w">  </span><span class="nt">script</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install ai-provenance</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ai-prov validate --require-review</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ai-prov query --ai-percent &gt; metrics.txt</span>
+<span class="w">  </span><span class="nt">artifacts</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">reports</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">dotenv</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">metrics.txt</span>
+</code></pre></div>
+
+<h2 id="architecture">Architecture</h2>
+<div class="codehilite"><pre><span></span><code>ai-provenance/
+├── src/ai_provenance/
+│   ├── cli/          # Command-line interface
+│   ├── core/         # Core metadata models and schemas
+│   ├── git_integration/ # Git hooks, filters, and notes
+│   ├── parsers/      # Language-agnostic code parsers
+│   ├── reporters/    # Report generation
+│   └── ci_templates/ # CI/CD templates
+├── hooks/            # Git hook templates
+├── tests/            # Test suite
+├── examples/         # Example repositories
+└── docs/             # Documentation
+</code></pre></div>
+
+<h2 id="best-practices">Best Practices</h2>
+<ol>
+<li><strong>Tag All AI Code</strong>: Use <code>ai-prov stamp</code> or inline comments for all AI-generated code</li>
+<li><strong>Review Required</strong>: Always have human review (<code>Reviewed-by: AI+&lt;email&gt;</code>)</li>
+<li><strong>Link to Requirements</strong>: Use <code>Trace: SPEC-xxx</code> for traceability</li>
+<li><strong>Test Coverage</strong>: Use <code>Test: TC-xxx</code> and ensure tests exist</li>
+<li><strong>Confidence Levels</strong>:<br />
+   - <code>high</code>: Copy-pasted with minor edits<br />
+   - <code>med</code>: Significant modifications<br />
+   - <code>low</code>: AI-assisted but mostly human-written</li>
+<li><strong>Commit Conventions</strong>: Follow structured format for machine parsing</li>
+<li><strong>CI Validation</strong>: Run <code>ai-prov validate</code> in CI/CD pipeline</li>
+</ol>
+<h2 id="development">Development</h2>
+<h3 id="setup">Setup</h3>
+<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ai-provenance/ai-provenance
+<span class="nb">cd</span><span class="w"> </span>ai-provenance
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+</code></pre></div>
+
+<h3 id="run-tests">Run Tests</h3>
+<div class="codehilite"><pre><span></span><code>pytest
+</code></pre></div>
+
+<h3 id="format-code">Format Code</h3>
+<div class="codehilite"><pre><span></span><code>black<span class="w"> </span>src<span class="w"> </span>tests
+ruff<span class="w"> </span>check<span class="w"> </span>src<span class="w"> </span>tests
+</code></pre></div>
+
+<h2 id="license">License</h2>
+<p>MIT License - see <a href="LICENSE">LICENSE</a> for details.</p>
+<h2 id="contributing">Contributing</h2>
+<p>Contributions welcome! Please read <a href="CONTRIBUTING.md">CONTRIBUTING.md</a> for guidelines.</p>
+<h2 id="support">Support</h2>
+<ul>
+<li>📚 <a href="https://ai-provenance.readthedocs.io">Documentation</a></li>
+<li>🐛 <a href="https://github.com/ai-provenance/ai-provenance/issues">Issue Tracker</a></li>
+<li>💬 <a href="https://github.com/ai-provenance/ai-provenance/discussions">Discussions</a></li>
+</ul>
+    <footer style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; opacity: 0.7;">
+        <p>Generated with AI Provenance Documentation Generator</p>
+    </footer>
+</body>
+</html>

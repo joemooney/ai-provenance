@@ -702,6 +702,43 @@ Test: TC-001"
 Guide the user through each step and ensure they understand the provenance workflow.
 """
 
+COMMAND_DOC = """# Generate and Manage Documentation
+
+You are helping the user with documentation tasks for their project.
+
+**Use the AskUserQuestion tool to ask what documentation task they need.**
+
+## Available Documentation Tasks
+
+### 1. Generate HTML Documentation
+Generate HTML versions of Markdown documentation.
+
+**Command:**
+```bash
+python helper/generate_docs.py
+```
+
+This converts README.md and other docs to HTML with light/dark mode CSS.
+
+### 2. Update README.md
+Update README with latest features from CLAUDE.md.
+
+### 3. Update CLAUDE.md
+Update project context with recent changes and new features.
+
+### 4. Generate Changelog
+Create CHANGELOG.md from git commit history.
+
+## Workflow
+
+1. Ask which documentation task
+2. Execute the appropriate action
+3. Show what was generated
+4. Ask if they want to commit changes
+
+Be helpful and guide the user through documentation!
+"""
+
 
 class ProjectScaffolder:
     """Create recommended project structure."""
@@ -813,6 +850,7 @@ See `.standards/` for coding standards and conventions.
             ".claude/commands/implement.md": COMMAND_IMPLEMENT,
             ".claude/commands/trace.md": COMMAND_TRACE,
             ".claude/commands/stamp.md": COMMAND_STAMP,
+            ".claude/commands/doc.md": COMMAND_DOC,
         }
 
         for file_path, content in commands.items():
@@ -836,6 +874,6 @@ See `.standards/` for coding standards and conventions.
                 for v in RECOMMENDED_STRUCTURE.values()
             ),
             "templates": 4,
-            "commands": 4,
+            "commands": 5,
             "description": "Recommended AI-provenance project structure",
         }

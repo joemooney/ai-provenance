@@ -1,0 +1,26 @@
+requirements:
+- id: 607738f8-4764-4943-8a4c-c5943b406d6c
+  title: Git Integration
+  description: Support git hooks, notes, and filters for AI metadata tracking
+  status: Draft
+  priority: High
+  owner: ''
+  feature: 1-Core
+  created_at: 2025-11-23T03:31:08.543707514Z
+  modified_at: 2025-11-23T03:31:08.543707514Z
+  req_type: Functional
+  dependencies: []
+  tags: []
+- id: e367b4cd-d679-482c-b642-a507faafe6f1
+  title: Traceability Matrix
+  description: Generate traceability matrices linking requirements to code and tests
+  status: Draft
+  priority: Medium
+  owner: ''
+  feature: Reporting
+  created_at: 2025-11-23T03:31:14.277675189Z
+  modified_at: 2025-11-23T03:31:14.277675189Z
+  req_type: Functional
+  dependencies: []
+  tags: []
+next_feature_number: 2

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requirements Workflow - AI Provenance</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #24292e;
+            --code-bg: #f6f8fa;
+            --border: #e1e4e8;
+            --link: #0366d6;
+            --heading: #24292e;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0d1117;
+                --text: #c9d1d9;
+                --code-bg: #161b22;
+                --border: #30363d;
+                --link: #58a6ff;
+                --heading: #c9d1d9;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--heading);
+            margin: 1.5rem 0 1rem;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.3rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.3rem;
+        }
+
+        h3 { font-size: 1.25rem; }
+
+        p {
+            margin: 1rem 0;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 85%;
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        a {
+            color: var(--link);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--border);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text);
+            opacity: 0.8;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--code-bg);
+            font-weight: 600;
+        }
+
+        .toc {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 2rem 0;
+        }
+
+        .toc-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <nav style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+        <a href="index.html">Home</a> |
+        <a href="user-guide.html">User Guide</a> |
+        <a href="../api/index.html">API Docs</a>
+    </nav>
+    <h1 id="requirements-management-workflow">Requirements Management Workflow</h1>
+<h2 id="overview">Overview</h2>
+<p>AI Provenance uses a <strong>two-tier requirements architecture</strong> that balances human readability with machine automation:</p>
+<ol>
+<li><strong>Human-Readable Specs</strong> (<code>specs/requirements/*.md</code>) - IEEE-830 inspired Markdown with YAML front-matter</li>
+<li><strong>Machine-Processable Data</strong> (<code>.ai-prov/requirements/*.json</code>) - Pure JSON for CLI and automation</li>
+</ol>
+<h2 id="architecture">Architecture</h2>
+<div class="codehilite"><pre><span></span><code><span class="nv">Project</span><span class="w"> </span><span class="nv">Root</span>
+├──<span class="w"> </span><span class="nv">specs</span><span class="o">/</span><span class="nv">requirements</span><span class="o">/</span><span class="w">           </span>#<span class="w"> </span><span class="nv">Source</span><span class="w"> </span><span class="nv">of</span><span class="w"> </span><span class="nv">Truth</span><span class="w"> </span><span class="ss">(</span><span class="nv">Human</span><span class="o">-</span><span class="nv">First</span><span class="ss">)</span>
+│<span class="w">   </span>├──<span class="w"> </span><span class="nv">SPEC</span><span class="o">-</span><span class="mi">0001</span>.<span class="nv">md</span><span class="w">             </span>#<span class="w"> </span><span class="nv">Markdown</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">YAML</span><span class="w"> </span><span class="nv">front</span><span class="o">-</span><span class="nv">matter</span>
+│<span class="w">   </span>├──<span class="w"> </span><span class="nv">SPEC</span><span class="o">-</span><span class="mi">0002</span>.<span class="nv">md</span><span class="w">             </span>#<span class="w"> </span><span class="nv">Full</span><span class="w"> </span><span class="nv">IEEE</span><span class="o">-</span><span class="mi">830</span><span class="w"> </span><span class="nv">template</span>
+│<span class="w">   </span>└──<span class="w"> </span><span class="nv">TEMPLATE</span>.<span class="nv">md</span><span class="w">              </span>#<span class="w"> </span><span class="nv">Template</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">new</span><span class="w"> </span><span class="nv">requirements</span>
+│
+├──<span class="w"> </span>.<span class="nv">ai</span><span class="o">-</span><span class="nv">prov</span><span class="o">/</span><span class="nv">requirements</span><span class="o">/</span><span class="w">        </span>#<span class="w"> </span><span class="nv">Derived</span><span class="w"> </span><span class="nv">Data</span><span class="w"> </span><span class="ss">(</span><span class="nv">Machine</span><span class="o">-</span><span class="nv">First</span><span class="ss">)</span>
+│<span class="w">   </span>├──<span class="w"> </span><span class="nv">SPEC</span><span class="o">-</span><span class="mi">0001</span>.<span class="nv">json</span><span class="w">           </span>#<span class="w"> </span><span class="nv">Auto</span><span class="o">-</span><span class="nv">generated</span><span class="w"> </span><span class="nv">from</span><span class="w"> </span><span class="nv">Markdown</span>
+│<span class="w">   </span>├──<span class="w"> </span><span class="nv">SPEC</span><span class="o">-</span><span class="mi">0002</span>.<span class="nv">json</span><span class="w">           </span>#<span class="w"> </span><span class="nv">Used</span><span class="w"> </span><span class="nv">by</span><span class="w"> </span><span class="nv">CLI</span>,<span class="w"> </span><span class="nv">queries</span>,<span class="w"> </span><span class="nv">reports</span>
+│<span class="w">   </span>└──<span class="w"> </span>...
+│
+└──<span class="w"> </span>.<span class="nv">ai</span><span class="o">-</span><span class="nv">prov</span><span class="o">/</span><span class="nv">tests</span><span class="o">/</span><span class="w">               </span>#<span class="w"> </span><span class="nv">Test</span><span class="w"> </span><span class="nv">Cases</span>
+<span class="w">    </span>├──<span class="w"> </span><span class="nv">TC</span><span class="o">-</span><span class="mi">001</span>.<span class="nv">json</span>
+<span class="w">    </span>└──<span class="w"> </span>...
+</code></pre></div>
+
+<h2 id="markdown-template-ieee-830-style">Markdown Template (IEEE-830 Style)</h2>
+<p>Located at: <code>src/ai_provenance/requirements/templates/ieee830.md</code></p>
+<h3 id="structure">Structure</h3>
+<div class="codehilite"><pre><span></span><code>---
+id: SPEC-0123
+version: 1.0
+status: Draft
+priority: High
+ai_generated: true
+ai_tool: claude
+ai_confidence: high
+authors:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>alice@example.com
+reviewers:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>bob@example.com
+reviewed_at: 2025-11-16T14:30:00Z
+parent: EPIC-45
+<span class="gu">tags: [auth, security, oauth]</span>
+<span class="gu">---</span>
+
+<span class="gh"># SPEC-0123: JWT Token Refresh Endpoint</span>
+
+<span class="gu">## 1. Requirement Statement</span>
+The system <span class="gs">**shall**</span> provide...
+
+<span class="gu">## 2. Rationale</span>
+Why this requirement exists...
+
+<span class="gu">## 3. Source</span>
+<span class="k">-</span><span class="w"> </span>Stakeholder: Product Owner
+<span class="k">-</span><span class="w"> </span>Reference: [PRD v3.1]
+
+<span class="gu">## 4. Fit Criterion (Verification)</span>
+| Test Case | Expected Result |
+|-----------|-----------------|
+| TC-210    | POST /auth/refresh → 200 OK |
+
+<span class="gu">## 5. Dependencies</span>
+<span class="k">-</span><span class="w"> </span>SPEC-0089
+<span class="k">-</span><span class="w"> </span>SPEC-0090
+
+<span class="gu">## 6. Assumptions</span>
+<span class="k">-</span><span class="w"> </span>Clock skew ≤ 30 seconds
+
+<span class="gu">## 7. Risks &amp; Mitigations</span>
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Token replay | Low | High | One-time use |
+
+<span class="gu">## 8. Open Issues</span>
+<span class="k">- [ ]</span> Support PKCE?
+
+<span class="gu">## 9. Change History</span>
+| Version | Date | Author | Change |
+|---------|------|--------|--------|
+| 1.0 | 2025-11-16 | alice | Initial |
+</code></pre></div>
+
+<h3 id="benefits">Benefits</h3>
+<p>✅ <strong>Human-readable</strong> - Markdown with clear structure<br />
+✅ <strong>Machine-parsable</strong> - YAML front-matter for automation<br />
+✅ <strong>Git-friendly</strong> - Text-based, excellent diffs<br />
+✅ <strong>Compliance-ready</strong> - IEEE-830, DO-178C, ASPICE compatible<br />
+✅ <strong>Traceable</strong> - Built-in links to parent, tests, dependencies<br />
+✅ <strong>AI-aware</strong> - ai_generated, ai_tool, reviewers fields</p>
+<h2 id="json-format">JSON Format</h2>
+<p>Located at: <code>.ai-prov/requirements/SPEC-XXX.json</code></p>
+<h3 id="structure_1">Structure</h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;SPEC-0123&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;JWT Token Refresh Endpoint&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;The system shall provide...&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;implemented&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;priority&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-11-16T14:00:00Z&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-11-16T15:30:00Z&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;created_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alice@example.com&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;EPIC-45&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;children&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="nt">&quot;related&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;SPEC-0089&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;SPEC-0090&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;src/auth/refresh.py&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;commits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;abc123&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;tests&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;TC-210&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;TC-211&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;ai_generated&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;ai_tool&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;auth&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;security&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;acceptance_criteria&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;Valid refresh token → new access token&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Invalid token → 401&quot;</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h3 id="benefits_1">Benefits</h3>
+<p>✅ <strong>Fast queries</strong> - Programmatic access via RequirementManager<br />
+✅ <strong>Pydantic validation</strong> - Type-safe with auto-validation<br />
+✅ <strong>CLI integration</strong> - Used by all ai-prov commands<br />
+✅ <strong>Traceability</strong> - Direct links to files, commits, tests</p>
+<h2 id="workflow">Workflow</h2>
+<h3 id="1-create-new-requirement">1. Create New Requirement</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Option A: Generate from template</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>create<span class="w"> </span>SPEC-0123<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--title<span class="w"> </span><span class="s2">&quot;JWT Token Refresh&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--description<span class="w"> </span><span class="s2">&quot;Implement refresh endpoint&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--template<span class="w"> </span>ieee830
+
+<span class="c1"># Creates:</span>
+<span class="c1"># - specs/requirements/SPEC-0123.md (full template)</span>
+<span class="c1"># - .ai-prov/requirements/SPEC-0123.json (extracted from YAML)</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Option B: Manual creation</span>
+<span class="c1"># 1. Copy specs/requirements/TEMPLATE.md</span>
+<span class="c1"># 2. Fill in sections</span>
+<span class="c1"># 3. Sync to JSON</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>sync<span class="w"> </span>--md-to-json
+</code></pre></div>
+
+<h3 id="2-edit-requirement">2. Edit Requirement</h3>
+<p><strong>Edit the Markdown file</strong> (source of truth):</p>
+<div class="codehilite"><pre><span></span><code>vim<span class="w"> </span>specs/requirements/SPEC-0123.md
+</code></pre></div>
+
+<p><strong>Sync changes to JSON</strong>:</p>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>requirement<span class="w"> </span>sync<span class="w"> </span>--md-to-json
+<span class="c1"># or</span>
+git<span class="w"> </span>commit<span class="w">  </span><span class="c1"># Pre-commit hook auto-syncs</span>
+</code></pre></div>
+
+<h3 id="3-link-to-code">3. Link to Code</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Add trace comment in code</span>
+<span class="c1"># ai:claude:high | trace:SPEC-0123 | test:TC-210</span>
+
+<span class="c1"># Link file to requirement</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>link<span class="w"> </span>SPEC-0123<span class="w"> </span>--file<span class="w"> </span>src/auth/refresh.py
+
+<span class="c1"># Updates SPEC-0123.json with file reference</span>
+</code></pre></div>
+
+<h3 id="4-create-test-cases">4. Create Test Cases</h3>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span><span class="nb">test</span><span class="w"> </span>create<span class="w"> </span>TC-210<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--title<span class="w"> </span><span class="s2">&quot;Test JWT refresh&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--requirement<span class="w"> </span>SPEC-0123<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--file<span class="w"> </span>tests/test_auth.py
+
+<span class="c1"># Updates:</span>
+<span class="c1"># - .ai-prov/tests/TC-210.json</span>
+<span class="c1"># - .ai-prov/requirements/SPEC-0123.json (adds TC-210 to tests array)</span>
+</code></pre></div>
+
+<h3 id="5-generate-traceability-matrix">5. Generate Traceability Matrix</h3>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>trace-matrix<span class="w"> </span>--format<span class="w"> </span>markdown
+
+<span class="c1"># Output:</span>
+<span class="c1"># | SPEC      | Status      | AI    | Tests      | Files           |</span>
+<span class="c1"># |-----------|-------------|-------|------------|-----------------|</span>
+<span class="c1"># | SPEC-0123 | Implemented | ✓ High| TC-210,211 | src/auth/refresh.py |</span>
+</code></pre></div>
+
+<h2 id="synchronization">Synchronization</h2>
+<h3 id="markdown-json-primary-flow">Markdown → JSON (Primary Flow)</h3>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>requirement<span class="w"> </span>sync<span class="w"> </span>--md-to-json
+</code></pre></div>
+
+<ul>
+<li>Reads all <code>specs/requirements/SPEC-*.md</code></li>
+<li>Parses YAML front-matter</li>
+<li>Extracts structured sections (fit criteria, dependencies)</li>
+<li>Generates/updates <code>.ai-prov/requirements/SPEC-*.json</code></li>
+</ul>
+<h3 id="json-markdown-rare">JSON → Markdown (Rare)</h3>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>requirement<span class="w"> </span>sync<span class="w"> </span>--json-to-md<span class="w"> </span>--template<span class="w"> </span>ieee830
+</code></pre></div>
+
+<ul>
+<li>Reads all <code>.ai-prov/requirements/SPEC-*.json</code></li>
+<li>Applies IEEE-830 template</li>
+<li>Generates <code>specs/requirements/SPEC-*.md</code></li>
+<li><strong>Warning</strong>: Overwrites existing Markdown!</li>
+</ul>
+<h3 id="auto-sync-recommended">Auto-Sync (Recommended)</h3>
+<p>Add to <code>.git/hooks/pre-commit</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="c1"># Auto-sync requirements on commit</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>sync<span class="w"> </span>--md-to-json<span class="w"> </span>--quiet
+git<span class="w"> </span>add<span class="w"> </span>.ai-prov/requirements/*.json
+</code></pre></div>
+
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-markdown-is-source-of-truth">1. <strong>Markdown is Source of Truth</strong></h3>
+<ul>
+<li>Edit requirements in <code>specs/requirements/*.md</code></li>
+<li>JSON files are <strong>derived</strong> (auto-generated)</li>
+<li>Never manually edit JSON files</li>
+</ul>
+<h3 id="2-version-control">2. <strong>Version Control</strong></h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Commit both formats together</span>
+git<span class="w"> </span>add<span class="w"> </span>specs/requirements/SPEC-0123.md
+git<span class="w"> </span>add<span class="w"> </span>.ai-prov/requirements/SPEC-0123.json
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;[AI:claude:high] feat: add JWT refresh requirement</span>
+
+<span class="s2">Trace: SPEC-0123&quot;</span>
+</code></pre></div>
+
+<h3 id="3-review-process">3. <strong>Review Process</strong></h3>
+<ol>
+<li>Create requirement in Draft status</li>
+<li>Add to <code>reviewers</code> list in YAML front-matter</li>
+<li>Review → Update <code>status: Approved</code></li>
+<li>Update <code>reviewed_at</code> timestamp</li>
+<li>Sync and commit</li>
+</ol>
+<h3 id="4-ai-generation">4. <strong>AI Generation</strong></h3>
+<p>When AI generates a requirement:</p>
+<div class="codehilite"><pre><span></span><code><span class="nn">---</span>
+<span class="nt">ai_generated</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">ai_tool</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">claude</span>
+<span class="nt">ai_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">high</span>
+<span class="nt">reviewers</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">human@example.com</span><span class="w">  </span><span class="c1"># Must add human reviewer</span>
+<span class="nt">reviewed_at</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">      </span><span class="c1"># Pending review</span>
+<span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Draft</span><span class="w">          </span><span class="c1"># Start in draft</span>
+<span class="nn">---</span>
+</code></pre></div>
+
+<h3 id="5-traceability">5. <strong>Traceability</strong></h3>
+<p>Always link requirements to:<br />
+- <strong>Parent</strong> (epic, user story)<br />
+- <strong>Tests</strong> (in fit criterion table)<br />
+- <strong>Dependencies</strong> (other requirements)<br />
+- <strong>Files</strong> (via inline comments or CLI)</p>
+<h2 id="migration-from-existing-systems">Migration from Existing Systems</h2>
+<h3 id="from-jiralinear">From Jira/Linear</h3>
+<ol>
+<li>Export requirements to CSV</li>
+<li>Convert to Markdown using script:</li>
+</ol>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>scripts/import_from_csv.py<span class="w"> </span>jira_export.csv<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--template<span class="w"> </span>ieee830<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output<span class="w"> </span>specs/requirements/
+</code></pre></div>
+
+<ol start="3">
+<li>Sync to JSON:</li>
+</ol>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>requirement<span class="w"> </span>sync<span class="w"> </span>--md-to-json
+</code></pre></div>
+
+<h3 id="from-existing-markdown">From Existing Markdown</h3>
+<p>If you have existing <code>*.md</code> requirements without YAML:</p>
+<ol>
+<li>Add YAML front-matter manually</li>
+<li>Or use conversion script:</li>
+</ol>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>scripts/add_frontmatter.py<span class="w"> </span>specs/requirements/*.md
+</code></pre></div>
+
+<h2 id="cli-commands-reference">CLI Commands Reference</h2>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Create</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>create<span class="w"> </span>SPEC-XXX<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"> </span>--description<span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"> </span><span class="o">[</span>--template<span class="w"> </span>ieee830<span class="o">]</span>
+
+<span class="c1"># List</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>list<span class="w"> </span><span class="o">[</span>--status<span class="w"> </span>approved<span class="o">]</span><span class="w"> </span><span class="o">[</span>--type<span class="w"> </span>feature<span class="o">]</span>
+
+<span class="c1"># Show</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>show<span class="w"> </span>SPEC-XXX<span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>md<span class="p">|</span>json<span class="o">]</span>
+
+<span class="c1"># Link</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>link<span class="w"> </span>SPEC-XXX<span class="w"> </span>--file<span class="w"> </span>path/to/file.py
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>link<span class="w"> </span>SPEC-XXX<span class="w"> </span>--commit<span class="w"> </span>abc123
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>link<span class="w"> </span>SPEC-XXX<span class="w"> </span>--test<span class="w"> </span>TC-210
+
+<span class="c1"># Sync</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>sync<span class="w"> </span><span class="o">[</span>--md-to-json<span class="w"> </span><span class="p">|</span><span class="w"> </span>--json-to-md<span class="o">]</span><span class="w"> </span><span class="o">[</span>--template<span class="w"> </span>ieee830<span class="o">]</span>
+
+<span class="c1"># Query</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>find<span class="w"> </span>--untested
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>find<span class="w"> </span>--by-file<span class="w"> </span>src/auth.py
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>find<span class="w"> </span>--by-status<span class="w"> </span>draft
+
+<span class="c1"># Traceability</span>
+ai-prov<span class="w"> </span>trace-matrix<span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>md<span class="p">|</span>json<span class="p">|</span>html<span class="o">]</span>
+</code></pre></div>
+
+<h2 id="example-complete-requirement-lifecycle">Example: Complete Requirement Lifecycle</h2>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 1. Create requirement</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>create<span class="w"> </span>SPEC-0200<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--title<span class="w"> </span><span class="s2">&quot;Rate limiting for API&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--description<span class="w"> </span><span class="s2">&quot;Implement token bucket rate limiter&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--priority<span class="w"> </span>high<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--template<span class="w"> </span>ieee830
+
+<span class="c1"># 2. Edit Markdown (add details, fit criteria, risks)</span>
+vim<span class="w"> </span>specs/requirements/SPEC-0200.md
+
+<span class="c1"># 3. Create test case</span>
+ai-prov<span class="w"> </span><span class="nb">test</span><span class="w"> </span>create<span class="w"> </span>TC-400<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--title<span class="w"> </span><span class="s2">&quot;Test rate limiter&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--requirement<span class="w"> </span>SPEC-0200<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--file<span class="w"> </span>tests/test_rate_limit.py
+
+<span class="c1"># 4. Implement feature (with inline metadata)</span>
+cat<span class="w"> </span>&gt;<span class="w"> </span>src/rate_limiter.py<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s"># ai:claude:high | trace:SPEC-0200 | test:TC-400</span>
+
+<span class="s">class TokenBucketLimiter:</span>
+<span class="s">    # Implementation...</span>
+<span class="s">EOF</span>
+
+<span class="c1"># 5. Link file to requirement</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>link<span class="w"> </span>SPEC-0200<span class="w"> </span>--file<span class="w"> </span>src/rate_limiter.py
+
+<span class="c1"># 6. Commit with provenance</span>
+ai-prov<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: implement rate limiter&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--tool<span class="w"> </span>claude<span class="w"> </span>--conf<span class="w"> </span>high<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--trace<span class="w"> </span>SPEC-0200<span class="w"> </span>--test<span class="w"> </span>TC-400
+
+<span class="c1"># 7. Mark as implemented</span>
+vim<span class="w"> </span>specs/requirements/SPEC-0200.md<span class="w">  </span><span class="c1"># Update status: Implemented</span>
+
+<span class="c1"># 8. Sync and verify</span>
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>sync<span class="w"> </span>--md-to-json
+ai-prov<span class="w"> </span>requirement<span class="w"> </span>show<span class="w"> </span>SPEC-0200
+ai-prov<span class="w"> </span>trace-matrix<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>SPEC-0200
+
+<span class="c1"># 9. Final commit</span>
+git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;[AI:claude:high] docs: complete SPEC-0200 implementation</span>
+
+<span class="s2">Trace: SPEC-0200</span>
+<span class="s2">Test: TC-400&quot;</span>
+</code></pre></div>
+
+<h2 id="compliance-auditing">Compliance &amp; Auditing</h2>
+<p>The two-tier system supports:</p>
+<ul>
+<li><strong>DO-178C</strong> (aviation software)</li>
+<li><strong>ISO 26262</strong> (automotive)</li>
+<li><strong>IEC 62304</strong> (medical devices)</li>
+<li><strong>ASPICE</strong> (automotive SPICE)</li>
+<li><strong>IEEE-830</strong> (software requirements)</li>
+</ul>
+<p>All traceability links are bidirectional and stored in Git for full audit trail.</p>
+<h2 id="future-enhancements">Future Enhancements</h2>
+<ul>
+<li>[ ] Web dashboard for requirements browsing</li>
+<li>[ ] Import/export to Jira, Linear, GitHub Issues</li>
+<li>[ ] Automated requirement validation in CI</li>
+<li>[ ] Requirements coverage reports</li>
+<li>[ ] AI-powered requirement generation from prompts</li>
+<li>[ ] Requirement dependency graph visualization</li>
+</ul>
+    <footer style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; opacity: 0.7;">
+        <p>Generated with AI Provenance Documentation Generator</p>
+    </footer>
+</body>
+</html>
