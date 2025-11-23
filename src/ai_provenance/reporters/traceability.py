@@ -10,6 +10,7 @@ from typing import Optional
 import git
 
 from ai_provenance.git_integration.notes import get_ai_commits
+from ai_provenance import requirements as req_reader
 
 
 def generate_trace_matrix(
@@ -67,11 +68,27 @@ def generate_trace_matrix(
 
 def _format_markdown_matrix(trace_data: dict) -> str:
     """Format traceability matrix as Markdown table."""
+    # Try to load requirements and mapping from requirements-manager
+    try:
+        requirements = req_reader.load_requirements()
+        mapping = req_reader.load_mapping()
+
+        # Create reverse mapping (SPEC-ID → requirement data)
+        spec_to_req = {}
+        for req in requirements:
+            uuid = req.get("id")
+            spec_id = mapping.get(uuid)
+            if spec_id:
+                spec_to_req[spec_id] = req
+    except Exception:
+        # If requirements.yaml doesn't exist, that's ok
+        spec_to_req = {}
+
     lines = [
         "# Traceability Matrix",
         "",
-        "| Feature | AI % | Commits | Files | Tests | Status |",
-        "|---------|------|---------|-------|-------|--------|",
+        "| SPEC-ID | Title | Status | AI % | Commits | Files | Tests |",
+        "|---------|-------|--------|------|---------|-------|-------|",
     ]
 
     for trace_id in sorted(trace_data.keys()):
@@ -81,18 +98,13 @@ def _format_markdown_matrix(trace_data: dict) -> str:
         num_files = len(data["files"])
         num_tests = len(data["tests"])
 
-        # Determine status
-        if num_tests == 0:
-            status = "⚠️ No tests"
-        elif ai_pct != "0%" and data.get("reviewed", False):
-            status = "✅ Reviewed"
-        elif ai_pct != "0%":
-            status = "⏳ Needs review"
-        else:
-            status = "✅ Complete"
+        # Get requirement details if available
+        req = spec_to_req.get(trace_id, {})
+        title = req.get("title", "Unknown")
+        req_status = req.get("status", "Unknown")
 
         lines.append(
-            f"| {trace_id} | {ai_pct} | {num_commits} | {num_files} | {num_tests} | {status} |"
+            f"| {trace_id} | {title} | {req_status} | {ai_pct} | {num_commits} | {num_files} | {num_tests} |"
         )
 
     lines.extend([
