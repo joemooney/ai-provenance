@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Walkthrough - AI Provenance</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #24292e;
+            --code-bg: #f6f8fa;
+            --border: #e1e4e8;
+            --link: #0366d6;
+            --heading: #24292e;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0d1117;
+                --text: #c9d1d9;
+                --code-bg: #161b22;
+                --border: #30363d;
+                --link: #58a6ff;
+                --heading: #c9d1d9;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--heading);
+            margin: 1.5rem 0 1rem;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.3rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.3rem;
+        }
+
+        h3 { font-size: 1.25rem; }
+
+        p {
+            margin: 1rem 0;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 85%;
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        a {
+            color: var(--link);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--border);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text);
+            opacity: 0.8;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--code-bg);
+            font-weight: 600;
+        }
+
+        .toc {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 2rem 0;
+        }
+
+        .toc-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <nav style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+        <a href="index.html">Home</a> |
+        <a href="user-guide.html">User Guide</a> |
+        <a href="../api/index.html">API Docs</a>
+    </nav>
+    <h1 id="ai-provenance-complete-walkthrough">AI Provenance Complete Walkthrough</h1>
+<p>This guide walks through creating a new project from scratch with AI provenance tracking and requirements-manager integration.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ol>
+<li>
+<p><strong>Install requirements-manager</strong>:<br />
+<code>bash
+   cd /home/joe/ai/req/requirements-manager
+   cargo build --release</code></p>
+</li>
+<li>
+<p><strong>Install ai-provenance</strong>:<br />
+<code>bash
+   cd /home/joe/ai/ai-provenance
+   pip install -e ".[dev]"</code></p>
+</li>
+</ol>
+<h2 id="step-by-step-walkthrough">Step-by-Step Walkthrough</h2>
+<h3 id="step-1-create-project-directory">Step 1: Create Project Directory</h3>
+<div class="codehilite"><pre><span></span><code>mkdir<span class="w"> </span>~/ai/demo-calculator
+<span class="nb">cd</span><span class="w"> </span>~/ai/demo-calculator
+</code></pre></div>
+
+<h3 id="step-2-initialize-git-repository">Step 2: Initialize Git Repository</h3>
+<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>init
+</code></pre></div>
+
+<h3 id="step-3-initialize-ai-provenance">Step 3: Initialize AI Provenance</h3>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>init
+</code></pre></div>
+
+<p>This creates:<br />
+- <code>.git/hooks/</code> - Git hooks for automatic metadata capture<br />
+- Git notes namespace <code>refs/notes/ai-provenance</code><br />
+- Git config for AI provenance</p>
+<h3 id="step-4-apply-feature-profile">Step 4: Apply Feature Profile</h3>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>features<span class="w"> </span>profile<span class="w"> </span>standard
+</code></pre></div>
+
+<p>This enables:<br />
+- Inline metadata stamping<br />
+- Commit message validation<br />
+- Git notes tracking<br />
+- Query and reporting<br />
+- Traceability matrix</p>
+<h3 id="step-5-scaffold-project-structure">Step 5: Scaffold Project Structure</h3>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>wizard<span class="w"> </span>scaffold
+</code></pre></div>
+
+<p>This creates:<br />
+- <code>.ai-prov/</code> - AI provenance data directory<br />
+- <code>.claude/commands/</code> - Claude Code slash commands:<br />
+  - <code>/req</code> - Create requirements<br />
+  - <code>/implement</code> - Implement features<br />
+  - <code>/trace</code> - Check traceability<br />
+  - <code>/stamp</code> - Add inline metadata<br />
+  - <code>/doc</code> - Generate documentation<br />
+- <code>.standards/</code> - Coding standards and conventions<br />
+- <code>docs/</code>, <code>specs/</code>, <code>tests/</code> - Standard directories</p>
+<h3 id="step-6-initialize-requirements">Step 6: Initialize Requirements</h3>
+<p>Create empty requirements.yaml:</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;requirements: []&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>requirements.yaml
+</code></pre></div>
+
+<h3 id="step-7-create-first-requirement">Step 7: Create First Requirement</h3>
+<p>Use requirements-manager to create a requirement:</p>
+<div class="codehilite"><pre><span></span><code>/home/joe/ai/req/requirements-manager/target/release/requirements-manager<span class="w"> </span>add<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--title<span class="w"> </span><span class="s2">&quot;Basic Calculator Operations&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--description<span class="w"> </span><span class="s2">&quot;Implement add, subtract, multiply, and divide operations&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--feature<span class="w"> </span>Core<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--priority<span class="w"> </span>High<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--status<span class="w"> </span>Draft
+</code></pre></div>
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span><code>Requirement added successfully!
+ID: 67befb88-1a5a-4751-9032-8c5f349d45fb
+</code></pre></div>
+
+<h3 id="step-8-generate-spec-id-mapping">Step 8: Generate SPEC-ID Mapping</h3>
+<div class="codehilite"><pre><span></span><code>/home/joe/ai/req/requirements-manager/target/release/requirements-manager<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--format<span class="w"> </span>mapping
+</code></pre></div>
+
+<p>This creates <code>.requirements-mapping.yaml</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">mappings</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">67befb88-1a5a-4751-9032-8c5f349d45fb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SPEC-001</span>
+<span class="nt">next_spec_number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+</code></pre></div>
+
+<p>Now you can reference the requirement as <strong>SPEC-001</strong> in your code.</p>
+<h3 id="step-9-implement-the-requirement">Step 9: Implement the Requirement</h3>
+<p>Create <code>src/calculator.py</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Simple calculator module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="c1"># ai:claude:high | trace:SPEC-001</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add two numbers.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+    <span class="c1"># /ai</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">subtract</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="c1"># ai:claude:high | trace:SPEC-001</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Subtract b from a.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span>
+    <span class="c1"># /ai</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="c1"># ai:claude:high | trace:SPEC-001</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Multiply two numbers.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+    <span class="c1"># /ai</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="c1"># ai:claude:high | trace:SPEC-001</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Divide a by b.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot divide by zero&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span>
+    <span class="c1"># /ai</span>
+</code></pre></div>
+
+<p>Create <code>tests/test_calculator.py</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Tests for calculator module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># ai:claude:high | trace:SPEC-001 | test:TC-001</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.calculator</span><span class="w"> </span><span class="kn">import</span> <span class="n">add</span><span class="p">,</span> <span class="n">subtract</span><span class="p">,</span> <span class="n">multiply</span><span class="p">,</span> <span class="n">divide</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_add</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test addition.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span>
+    <span class="k">assert</span> <span class="n">add</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_subtract</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test subtraction.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">subtract</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="n">subtract</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">subtract</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">5</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_multiply</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test multiplication.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">multiply</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+    <span class="k">assert</span> <span class="n">multiply</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">6</span>
+    <span class="k">assert</span> <span class="n">multiply</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_divide</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test division.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">divide</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="n">divide</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mf">2.5</span>
+
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+        <span class="n">divide</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># /ai</span>
+</code></pre></div>
+
+<h3 id="step-10-commit-with-ai-provenance">Step 10: Commit with AI Provenance</h3>
+<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>-A
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;[AI:claude:high] feat(calculator): implement basic operations</span>
+
+<span class="s2">Implement add, subtract, multiply, and divide operations with full test coverage.</span>
+
+<span class="s2">Trace: SPEC-001</span>
+<span class="s2">Test: TC-001</span>
+
+<span class="s2">🤖 Generated with [Claude Code](https://claude.com/claude-code)</span>
+
+<span class="s2">Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;&quot;</span>
+</code></pre></div>
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span><code>🤖 AI commit detected, validating metadata...
+✅ AI commit validation passed
+📝 Adding AI provenance metadata to git notes...
+✅ AI provenance metadata added to commit 101dfd8d
+</code></pre></div>
+
+<h3 id="step-11-verify-traceability">Step 11: Verify Traceability</h3>
+<h4 id="generate-traceability-matrix">Generate Traceability Matrix</h4>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>trace-matrix
+</code></pre></div>
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span><code># Traceability Matrix
+
+| SPEC-ID | Title | Status | AI % | Commits | Files | Tests |
+|---------|-------|--------|------|---------|-------|-------|
+| SPEC-001 | Basic Calculator Operations | Draft | 100% | 1 | 0 | 1 |
+</code></pre></div>
+
+<h4 id="check-ai-code-percentage">Check AI Code Percentage</h4>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>query<span class="w"> </span>--ai-percent
+</code></pre></div>
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span><code>AI-Generated Code: 18.00%
+  Total lines: 800
+  AI lines: 144
+</code></pre></div>
+
+<h4 id="generate-file-report">Generate File Report</h4>
+<div class="codehilite"><pre><span></span><code>ai-prov<span class="w"> </span>report<span class="w"> </span>src/calculator.py
+</code></pre></div>
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">AI</span><span class="w"> </span><span class="n">Metadata</span><span class="w"> </span><span class="n">Report</span><span class="p">:</span><span class="w"> </span><span class="n">src</span><span class="o">/</span><span class="n">calculator</span><span class="o">.</span><span class="n">py</span><span class="w"> </span><span class="err">@</span><span class="w"> </span><span class="n">HEAD</span>
+
+<span class="n">Commit</span><span class="w"> </span><span class="n">Metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="s2">&quot;ai_tool&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;trace&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;SPEC-001&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="s2">&quot;tests&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;TC-001&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="n">Inline</span><span class="w"> </span><span class="n">Metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="n">Line</span><span class="w"> </span><span class="mi">7</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;tool&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;claude&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;confidence&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;high&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;trace&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;SPEC-001&#39;</span><span class="p">}</span>
+<span class="w">  </span><span class="n">Line</span><span class="w"> </span><span class="mi">14</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;tool&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;claude&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;confidence&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;high&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;trace&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;SPEC-001&#39;</span><span class="p">}</span>
+<span class="w">  </span><span class="n">Line</span><span class="w"> </span><span class="mi">21</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;tool&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;claude&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;confidence&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;high&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;trace&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;SPEC-001&#39;</span><span class="p">}</span>
+<span class="w">  </span><span class="n">Line</span><span class="w"> </span><span class="mi">28</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;tool&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;claude&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;confidence&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;high&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;trace&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;SPEC-001&#39;</span><span class="p">}</span>
+</code></pre></div>
+
+<h4 id="view-git-notes">View Git Notes</h4>
+<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>notes<span class="w"> </span>--ref<span class="w"> </span>ai-provenance<span class="w"> </span>show
+</code></pre></div>
+
+<p>Output:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;ai_tool&quot;</span><span class="p">:</span><span class="s2">&quot;claude&quot;</span><span class="p">,</span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="s2">&quot;high&quot;</span><span class="p">,</span><span class="nt">&quot;trace&quot;</span><span class="p">:[</span><span class="s2">&quot;SPEC-001&quot;</span><span class="p">],</span><span class="nt">&quot;tests&quot;</span><span class="p">:[</span><span class="s2">&quot;TC-001&quot;</span><span class="p">]}</span>
+</code></pre></div>
+
+<h2 id="summary">Summary</h2>
+<p>You've successfully created a project with:</p>
+<p>✅ <strong>Git initialization</strong> with AI provenance hooks<br />
+✅ <strong>Requirements management</strong> via requirements-manager<br />
+✅ <strong>SPEC-ID mapping</strong> for traceability<br />
+✅ <strong>Inline AI metadata</strong> in code<br />
+✅ <strong>Git commit metadata</strong> with Trace: and Test: links<br />
+✅ <strong>Git notes</strong> for immutable provenance<br />
+✅ <strong>Traceability matrix</strong> showing complete links<br />
+✅ <strong>AI percentage tracking</strong> across the codebase</p>
+<h2 id="using-claude-code-slash-commands">Using Claude Code Slash Commands</h2>
+<p>If you're using Claude Code, you can use the slash commands created during scaffolding:</p>
+<h3 id="req-create-requirement"><code>/req</code> - Create Requirement</h3>
+<p>Interactive requirement creation using requirements-manager.</p>
+<h3 id="implement-implement-feature"><code>/implement</code> - Implement Feature</h3>
+<p>Guided implementation of a requirement with automatic AI tagging.</p>
+<h3 id="trace-check-traceability"><code>/trace</code> - Check Traceability</h3>
+<p>Verify traceability between requirements, code, and tests.</p>
+<h3 id="stamp-add-inline-metadata"><code>/stamp</code> - Add Inline Metadata</h3>
+<p>Add AI metadata tags to existing code.</p>
+<h3 id="doc-generate-documentation"><code>/doc</code> - Generate Documentation</h3>
+<p>Generate HTML documentation from Markdown sources.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ol>
+<li>
+<p><strong>Add more requirements</strong>:<br />
+<code>bash
+   requirements-manager add -i
+   requirements-manager export --format mapping</code></p>
+</li>
+<li>
+<p><strong>Implement features with AI assistance</strong> (in Claude Code):<br />
+<code>/implement SPEC-002</code></p>
+</li>
+<li>
+<p><strong>Review AI-generated code</strong>:<br />
+<code>bash
+   ai-prov query --unreviewed
+   ai-prov validate --require-review</code></p>
+</li>
+<li>
+<p><strong>Generate reports</strong>:<br />
+<code>bash
+   ai-prov trace-matrix
+   ai-prov query --ai-percent --path src/</code></p>
+</li>
+<li>
+<p><strong>Push git notes</strong>:<br />
+<code>bash
+   git push origin refs/notes/ai-provenance</code></p>
+</li>
+</ol>
+<h2 id="architecture">Architecture</h2>
+<div class="codehilite"><pre><span></span><code>demo-calculator/
+├── requirements.yaml                  # requirements-manager (source of truth)
+├── .requirements-mapping.yaml         # UUID → SPEC-ID mapping
+├── .git/
+│   ├── hooks/                        # AI provenance hooks
+│   └── refs/notes/ai-provenance      # Commit metadata
+├── .claude/commands/                 # Claude Code slash commands
+├── src/calculator.py                 # Implementation (with inline tags)
+└── tests/test_calculator.py          # Tests (with inline tags)
+</code></pre></div>
+
+<h2 id="key-points">Key Points</h2>
+<ol>
+<li><strong>Single Source of Truth</strong>: requirements.yaml is managed by requirements-manager</li>
+<li><strong>Direct Reading</strong>: ai-provenance reads requirements.yaml directly (no export/import)</li>
+<li><strong>Automatic Linking</strong>: Trace: SPEC-XXX in commits creates traceability links</li>
+<li><strong>Inline Metadata</strong>: <code># ai:tool:conf | trace:SPEC-XXX</code> tags code blocks</li>
+<li><strong>Git Notes</strong>: Immutable provenance metadata stored in Git</li>
+<li><strong>Validation</strong>: Pre-commit hooks validate metadata format</li>
+<li><strong>Reporting</strong>: Full traceability matrix and AI metrics</li>
+</ol>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="requirements-manager-not-found">requirements-manager not found</h3>
+<p>Add to PATH or use full path:</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/home/joe/ai/req/requirements-manager/target/release:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<p>Or use full path in commands:</p>
+<div class="codehilite"><pre><span></span><code>/home/joe/ai/req/requirements-manager/target/release/requirements-manager
+</code></pre></div>
+
+<h3 id="git-hooks-not-running">Git hooks not running</h3>
+<p>Ensure hooks are executable:</p>
+<div class="codehilite"><pre><span></span><code>chmod<span class="w"> </span>+x<span class="w"> </span>.git/hooks/commit-msg
+chmod<span class="w"> </span>+x<span class="w"> </span>.git/hooks/post-commit
+chmod<span class="w"> </span>+x<span class="w"> </span>.git/hooks/pre-push
+</code></pre></div>
+
+<h3 id="missing-requirementsyaml">Missing requirements.yaml</h3>
+<p>Create it first:</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;requirements: []&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>requirements.yaml
+</code></pre></div>
+
+<h3 id="ai-percentage-seems-low">AI percentage seems low</h3>
+<p>Make sure to:<br />
+1. Use inline metadata tags (<code># ai:tool:conf</code>)<br />
+2. Include closing tags (<code># /ai</code>)<br />
+3. Tag all AI-generated files (including support files)</p>
+    <footer style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; opacity: 0.7;">
+        <p>Generated with AI Provenance Documentation Generator</p>
+    </footer>
+</body>
+</html>

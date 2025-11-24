@@ -227,6 +227,7 @@ def main():
         # (source_md, output_html, title)
         (repo_root / "README.md", repo_root / "docs" / "guides" / "user-guide.html", "User Guide"),
         (repo_root / "docs" / "REQUIREMENTS_WORKFLOW.md", repo_root / "docs" / "guides" / "requirements-workflow.html", "Requirements Workflow"),
+        (repo_root / "docs" / "WALKTHROUGH.md", repo_root / "docs" / "guides" / "walkthrough.html", "Complete Walkthrough"),
     ]
 
     success_count = 0
@@ -245,6 +246,7 @@ def main():
 
 - [User Guide](user-guide.html) - Complete guide to using ai-provenance
 - [Requirements Workflow](requirements-workflow.html) - Managing requirements with ai-provenance
+- [Complete Walkthrough](walkthrough.html) - Step-by-step project setup from scratch
 
 ## API Documentation
 

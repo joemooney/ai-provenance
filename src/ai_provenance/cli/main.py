@@ -528,5 +528,79 @@ def wizard_scaffold(dry_run: bool) -> None:
         raise click.Abort()
 
 
+# ============================================================================
+# Documentation Commands
+# ============================================================================
+
+
+@cli.command()
+@click.argument("guide", type=click.Choice(["user", "workflow", "walkthrough", "index"]), default="index", required=False)
+@click.option("--dark", is_flag=True, help="Force dark mode (uses system preference by default)")
+@click.option("--light", is_flag=True, help="Force light mode (uses system preference by default)")
+@click.option("--regenerate", is_flag=True, help="Regenerate HTML from Markdown before opening")
+def docs(guide: str, dark: bool, light: bool, regenerate: bool) -> None:
+    """
+    Open documentation in web browser.
+
+    Available guides:
+    - user: User guide (README)
+    - workflow: Requirements workflow guide
+    - walkthrough: Complete project setup walkthrough
+    - index: Documentation index (default)
+    """
+    import webbrowser
+    from pathlib import Path
+    import subprocess
+
+    # Regenerate if requested
+    if regenerate:
+        try:
+            repo_root = Path(__file__).parent.parent.parent
+            script = repo_root / "helper" / "generate_docs.py"
+            console.print("Regenerating documentation...")
+            subprocess.run(["python", str(script)], check=True)
+            console.print("[green]✓[/green] Documentation regenerated")
+        except Exception as e:
+            console.print(f"[yellow]⚠[/yellow] Could not regenerate docs: {e}")
+
+    # Map guide names to HTML files
+    guide_map = {
+        "user": "user-guide.html",
+        "workflow": "requirements-workflow.html",
+        "walkthrough": "walkthrough.html",
+        "index": "index.html",
+    }
+
+    # Get the HTML file path
+    repo_root = Path(__file__).parent.parent.parent
+    html_file = repo_root / "docs" / "guides" / guide_map[guide]
+
+    if not html_file.exists():
+        console.print(f"[red]✗[/red] Documentation file not found: {html_file}")
+        console.print("\nTry regenerating with: [bold]ai-prov docs --regenerate[/bold]")
+        raise click.Abort()
+
+    # Handle dark/light mode preference
+    # Note: The HTML already uses @media (prefers-color-scheme: dark)
+    # We can't force it without modifying the HTML or using browser flags
+    if dark and light:
+        console.print("[yellow]⚠[/yellow] Cannot use both --dark and --light. Using system preference.")
+    elif dark:
+        console.print("[dim]Note: Dark mode is controlled by system preferences in the HTML.[/dim]")
+    elif light:
+        console.print("[dim]Note: Light mode is controlled by system preferences in the HTML.[/dim]")
+
+    # Open in browser
+    try:
+        file_url = f"file://{html_file.absolute()}"
+        console.print(f"Opening [bold]{guide}[/bold] guide in browser...")
+        webbrowser.open(file_url)
+        console.print(f"[green]✓[/green] Opened: {file_url}")
+    except Exception as e:
+        console.print(f"[red]✗[/red] Could not open browser: {e}")
+        console.print(f"\nManually open: {html_file}")
+        raise click.Abort()
+
+
 if __name__ == "__main__":
     cli()
