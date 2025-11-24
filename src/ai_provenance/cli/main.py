@@ -515,11 +515,11 @@ def wizard_scaffold(dry_run: bool) -> None:
             console.print("  2. Customize for your project")
             console.print("  3. Run: ai-prov wizard init")
             console.print("\n[bold]Claude Code integration:[/bold]")
-            console.print("  • Use /req to create requirements interactively")
-            console.print("  • Use /implement to build features from requirements")
-            console.print("  • Use /trace to link code to requirements")
-            console.print("  • Use /stamp to add AI metadata to files")
-            console.print("  • Use /doc to generate and manage documentation")
+            console.print("  • Use /ap-req to create requirements interactively")
+            console.print("  • Use /ap-implement to build features from requirements")
+            console.print("  • Use /ap-trace to link code to requirements")
+            console.print("  • Use /ap-stamp to add AI metadata to files")
+            console.print("  • Use /ap-doc to generate and manage documentation")
         else:
             console.print("\n[yellow]Run without --dry-run to create these files[/yellow]")
 

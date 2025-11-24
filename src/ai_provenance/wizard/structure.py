@@ -862,15 +862,15 @@ See `.standards/` for coding standards and conventions.
         return readme_addition
 
     def create_claude_commands(self, dry_run: bool = False) -> List[str]:
-        """Create Claude Code slash commands."""
+        """Create Claude Code slash commands with /ap- prefix."""
         created = []
 
         commands = {
-            ".claude/commands/req.md": COMMAND_REQ,
-            ".claude/commands/implement.md": COMMAND_IMPLEMENT,
-            ".claude/commands/trace.md": COMMAND_TRACE,
-            ".claude/commands/stamp.md": COMMAND_STAMP,
-            ".claude/commands/doc.md": COMMAND_DOC,
+            ".claude/commands/ap-req.md": COMMAND_REQ,
+            ".claude/commands/ap-implement.md": COMMAND_IMPLEMENT,
+            ".claude/commands/ap-trace.md": COMMAND_TRACE,
+            ".claude/commands/ap-stamp.md": COMMAND_STAMP,
+            ".claude/commands/ap-doc.md": COMMAND_DOC,
         }
 
         for file_path, content in commands.items():

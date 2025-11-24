@@ -207,11 +207,11 @@
 <p>This creates:<br />
 - <code>.ai-prov/</code> - AI provenance data directory<br />
 - <code>.claude/commands/</code> - Claude Code slash commands:<br />
-  - <code>/req</code> - Create requirements<br />
-  - <code>/implement</code> - Implement features<br />
-  - <code>/trace</code> - Check traceability<br />
-  - <code>/stamp</code> - Add inline metadata<br />
-  - <code>/doc</code> - Generate documentation<br />
+  - <code>/ap-req</code> - Create requirements<br />
+  - <code>/ap-implement</code> - Implement features<br />
+  - <code>/ap-trace</code> - Check traceability<br />
+  - <code>/ap-stamp</code> - Add inline metadata<br />
+  - <code>/ap-doc</code> - Generate documentation<br />
 - <code>.standards/</code> - Coding standards and conventions<br />
 - <code>docs/</code>, <code>specs/</code>, <code>tests/</code> - Standard directories</p>
 <h3 id="step-6-initialize-requirements">Step 6: Initialize Requirements</h3>
@@ -410,15 +410,15 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 ✅ <strong>AI percentage tracking</strong> across the codebase</p>
 <h2 id="using-claude-code-slash-commands">Using Claude Code Slash Commands</h2>
 <p>If you're using Claude Code, you can use the slash commands created during scaffolding:</p>
-<h3 id="req-create-requirement"><code>/req</code> - Create Requirement</h3>
+<h3 id="ap-req-create-requirement"><code>/ap-req</code> - Create Requirement</h3>
 <p>Interactive requirement creation using requirements-manager.</p>
-<h3 id="implement-implement-feature"><code>/implement</code> - Implement Feature</h3>
+<h3 id="ap-implement-implement-feature"><code>/ap-implement</code> - Implement Feature</h3>
 <p>Guided implementation of a requirement with automatic AI tagging.</p>
-<h3 id="trace-check-traceability"><code>/trace</code> - Check Traceability</h3>
+<h3 id="ap-trace-check-traceability"><code>/ap-trace</code> - Check Traceability</h3>
 <p>Verify traceability between requirements, code, and tests.</p>
-<h3 id="stamp-add-inline-metadata"><code>/stamp</code> - Add Inline Metadata</h3>
+<h3 id="ap-stamp-add-inline-metadata"><code>/ap-stamp</code> - Add Inline Metadata</h3>
 <p>Add AI metadata tags to existing code.</p>
-<h3 id="doc-generate-documentation"><code>/doc</code> - Generate Documentation</h3>
+<h3 id="ap-doc-generate-documentation"><code>/ap-doc</code> - Generate Documentation</h3>
 <p>Generate HTML documentation from Markdown sources.</p>
 <h2 id="next-steps">Next Steps</h2>
 <ol>
@@ -430,7 +430,7 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 </li>
 <li>
 <p><strong>Implement features with AI assistance</strong> (in Claude Code):<br />
-<code>/implement SPEC-002</code></p>
+<code>/ap-implement SPEC-002</code></p>
 </li>
 <li>
 <p><strong>Review AI-generated code</strong>:<br />

@@ -64,11 +64,11 @@ ai-prov wizard scaffold
 This creates:
 - `.ai-prov/` - AI provenance data directory
 - `.claude/commands/` - Claude Code slash commands:
-  - `/req` - Create requirements
-  - `/implement` - Implement features
-  - `/trace` - Check traceability
-  - `/stamp` - Add inline metadata
-  - `/doc` - Generate documentation
+  - `/ap-req` - Create requirements
+  - `/ap-implement` - Implement features
+  - `/ap-trace` - Check traceability
+  - `/ap-stamp` - Add inline metadata
+  - `/ap-doc` - Generate documentation
 - `.standards/` - Coding standards and conventions
 - `docs/`, `specs/`, `tests/` - Standard directories
 
@@ -304,19 +304,19 @@ You've successfully created a project with:
 
 If you're using Claude Code, you can use the slash commands created during scaffolding:
 
-### `/req` - Create Requirement
+### `/ap-req` - Create Requirement
 Interactive requirement creation using requirements-manager.
 
-### `/implement` - Implement Feature
+### `/ap-implement` - Implement Feature
 Guided implementation of a requirement with automatic AI tagging.
 
-### `/trace` - Check Traceability
+### `/ap-trace` - Check Traceability
 Verify traceability between requirements, code, and tests.
 
-### `/stamp` - Add Inline Metadata
+### `/ap-stamp` - Add Inline Metadata
 Add AI metadata tags to existing code.
 
-### `/doc` - Generate Documentation
+### `/ap-doc` - Generate Documentation
 Generate HTML documentation from Markdown sources.
 
 ## Next Steps
@@ -329,7 +329,7 @@ Generate HTML documentation from Markdown sources.
 
 2. **Implement features with AI assistance** (in Claude Code):
    ```
-   /implement SPEC-002
+   /ap-implement SPEC-002
    ```
 
 3. **Review AI-generated code**:
