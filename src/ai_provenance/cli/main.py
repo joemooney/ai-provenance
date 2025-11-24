@@ -551,17 +551,46 @@ def docs(guide: str, dark: bool, light: bool, regenerate: bool) -> None:
     import webbrowser
     from pathlib import Path
     import subprocess
+    import os
 
-    # Regenerate if requested
+    # Find the repository root (works in dev and installed mode)
+    # In dev: __file__ is .../ai-provenance/src/ai_provenance/cli/main.py
+    # In installed: __file__ is .../site-packages/ai_provenance/cli/main.py
+    current_file = Path(__file__).resolve()
+
+    # Try to find repo root by looking for pyproject.toml
+    repo_root = None
+    for parent in [current_file.parent.parent.parent, current_file.parent.parent.parent.parent]:
+        if (parent / "pyproject.toml").exists() and (parent / "docs" / "guides").exists():
+            repo_root = parent
+            break
+
+    # If not found, check if we're in the source directory
+    if repo_root is None:
+        cwd = Path.cwd()
+        if (cwd / "pyproject.toml").exists() and (cwd / "docs" / "guides").exists():
+            repo_root = cwd
+        elif (cwd.parent / "pyproject.toml").exists() and (cwd.parent / "docs" / "guides").exists():
+            repo_root = cwd.parent
+
+    if repo_root is None:
+        console.print("[red]✗[/red] Could not find documentation directory.")
+        console.print("\nThe docs command only works when run from the ai-provenance repository.")
+        console.print("Visit: https://github.com/joemooney/ai-provenance/tree/master/docs/guides")
+        raise click.Abort()
+
+    # Regenerate if requested (only in dev mode)
     if regenerate:
-        try:
-            repo_root = Path(__file__).parent.parent.parent
-            script = repo_root / "helper" / "generate_docs.py"
-            console.print("Regenerating documentation...")
-            subprocess.run(["python", str(script)], check=True)
-            console.print("[green]✓[/green] Documentation regenerated")
-        except Exception as e:
-            console.print(f"[yellow]⚠[/yellow] Could not regenerate docs: {e}")
+        script = repo_root / "helper" / "generate_docs.py"
+        if script.exists():
+            try:
+                console.print("Regenerating documentation...")
+                subprocess.run(["python", str(script)], check=True, cwd=str(repo_root))
+                console.print("[green]✓[/green] Documentation regenerated")
+            except Exception as e:
+                console.print(f"[yellow]⚠[/yellow] Could not regenerate docs: {e}")
+        else:
+            console.print("[yellow]⚠[/yellow] Can only regenerate in development mode (helper script not found)")
 
     # Map guide names to HTML files
     guide_map = {
@@ -572,12 +601,12 @@ def docs(guide: str, dark: bool, light: bool, regenerate: bool) -> None:
     }
 
     # Get the HTML file path
-    repo_root = Path(__file__).parent.parent.parent
     html_file = repo_root / "docs" / "guides" / guide_map[guide]
 
     if not html_file.exists():
         console.print(f"[red]✗[/red] Documentation file not found: {html_file}")
-        console.print("\nTry regenerating with: [bold]ai-prov docs --regenerate[/bold]")
+        console.print("\nAvailable in repository at: docs/guides/")
+        console.print("Visit: https://github.com/joemooney/ai-provenance/tree/master/docs/guides")
         raise click.Abort()
 
     # Handle dark/light mode preference
