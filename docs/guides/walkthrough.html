@@ -212,6 +212,7 @@
   - <code>/ap-trace</code> - Check traceability<br />
   - <code>/ap-stamp</code> - Add inline metadata<br />
   - <code>/ap-doc</code> - Generate documentation<br />
+  - <code>/ap-release</code> - Check release readiness<br />
 - <code>.standards/</code> - Coding standards and conventions<br />
 - <code>docs/</code>, <code>specs/</code>, <code>tests/</code> - Standard directories</p>
 <h3 id="step-6-initialize-requirements">Step 6: Initialize Requirements</h3>
@@ -420,6 +421,13 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 <p>Add AI metadata tags to existing code.</p>
 <h3 id="ap-doc-generate-documentation"><code>/ap-doc</code> - Generate Documentation</h3>
 <p>Generate HTML documentation from Markdown sources.</p>
+<h3 id="ap-release-check-release-readiness"><code>/ap-release</code> - Check Release Readiness</h3>
+<p>Analyze repository changes and determine if it's time for a new release. Checks:<br />
+- Recent activity (commits in last 7 days)<br />
+- Lines changed since last tag (threshold: 3000)<br />
+- Days since last release (threshold: 7)<br />
+- Suggests version number based on commit messages<br />
+- Provides release recommendation with detailed report</p>
 <h2 id="next-steps">Next Steps</h2>
 <ol>
 <li>

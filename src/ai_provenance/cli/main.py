@@ -520,6 +520,7 @@ def wizard_scaffold(dry_run: bool) -> None:
             console.print("  • Use /ap-trace to link code to requirements")
             console.print("  • Use /ap-stamp to add AI metadata to files")
             console.print("  • Use /ap-doc to generate and manage documentation")
+            console.print("  • Use /ap-release to check release readiness")
         else:
             console.print("\n[yellow]Run without --dry-run to create these files[/yellow]")
 

@@ -69,6 +69,7 @@ This creates:
   - `/ap-trace` - Check traceability
   - `/ap-stamp` - Add inline metadata
   - `/ap-doc` - Generate documentation
+  - `/ap-release` - Check release readiness
 - `.standards/` - Coding standards and conventions
 - `docs/`, `specs/`, `tests/` - Standard directories
 
@@ -318,6 +319,14 @@ Add AI metadata tags to existing code.
 
 ### `/ap-doc` - Generate Documentation
 Generate HTML documentation from Markdown sources.
+
+### `/ap-release` - Check Release Readiness
+Analyze repository changes and determine if it's time for a new release. Checks:
+- Recent activity (commits in last 7 days)
+- Lines changed since last tag (threshold: 3000)
+- Days since last release (threshold: 7)
+- Suggests version number based on commit messages
+- Provides release recommendation with detailed report
 
 ## Next Steps
 

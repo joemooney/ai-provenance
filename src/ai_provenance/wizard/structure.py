@@ -759,6 +759,227 @@ Create CHANGELOG.md from git commit history.
 Be helpful and guide the user through documentation!
 """
 
+COMMAND_RELEASE = """# Release Readiness Check
+
+You are helping the user determine if it's time to create a new release.
+
+## Step 1: Check Recent Activity
+
+First, check if there have been any commits in the last 7 days:
+
+```bash
+git log --since="7 days ago" --oneline | wc -l
+```
+
+**If count is 0**: Stop and report "No commits in the last 7 days. No release needed."
+
+## Step 2: Find Latest Tag
+
+```bash
+# Get latest tag
+latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+# If no tags exist
+if [ -z "$latest_tag" ]; then
+    echo "No tags found - recommend initial v0.1.0 release"
+else
+    # Get tag date
+    git log -1 --format=%ai $latest_tag
+fi
+```
+
+## Step 3: Calculate Changes Since Last Tag
+
+```bash
+# Lines changed since tag (or since first commit if no tags)
+if [ -n "$latest_tag" ]; then
+    git diff --stat $latest_tag..HEAD | tail -1
+else
+    git diff --stat $(git rev-list --max-parents=0 HEAD)..HEAD | tail -1
+fi
+```
+
+Parse the output to extract:
+- Files changed
+- Lines added (insertions)
+- Lines removed (deletions)
+
+## Step 4: Calculate Days Since Last Tag
+
+```bash
+if [ -n "$latest_tag" ]; then
+    tag_date=$(git log -1 --format=%ct $latest_tag)
+    current_date=$(date +%s)
+    days_since=$((($current_date - $tag_date) / 86400))
+    echo "Days since last tag: $days_since"
+fi
+```
+
+## Step 5: Run tokei for Current Statistics
+
+```bash
+tokei --output json
+```
+
+If tokei is not installed, skip this step and note it in the report.
+
+## Step 6: Evaluate Thresholds
+
+Calculate total lines changed = insertions + deletions
+
+**Thresholds:**
+- Lines changed: > 3000 lines
+- Days since tag: > 7 days
+- Recent activity: At least 1 commit in last 7 days (required)
+
+**Default behavior:**
+- If EITHER threshold exceeded AND recent activity: **Recommend release (default: YES)**
+- If neither threshold met BUT recent activity exists: **Ask user (default: NO)**
+- If no recent activity: **No release**
+
+## Step 7: Suggest Version Number
+
+Analyze commit messages since last tag to determine version bump:
+
+```bash
+# Get commit messages since last tag
+if [ -n "$latest_tag" ]; then
+    git log $latest_tag..HEAD --format=%s
+else
+    git log --format=%s
+fi
+```
+
+**Version bump logic:**
+1. Look for keywords in commit messages:
+   - **Major**: "BREAKING CHANGE", "breaking:", "major:"
+   - **Minor**: "feat:", "feature:", "minor:"
+   - **Patch**: "fix:", "patch:", "chore:", "docs:", or default
+
+2. If current tag is v0.x.x, suggest bumping minor (pre-1.0 development)
+3. If no tag exists, suggest v0.1.0
+
+**Examples:**
+- v1.2.3 + patch → v1.2.4
+- v1.2.3 + minor → v1.3.0
+- v1.2.3 + major → v2.0.0
+- v0.5.0 + any → v0.6.0 (pre-1.0)
+- (no tag) → v0.1.0
+
+## Step 8: Generate Summary Report
+
+Display a well-formatted report:
+
+```
+===============================================
+Release Readiness Check
+===============================================
+
+Last Release:
+  Tag: v1.2.3 (or "None - initial release")
+  Date: 2025-11-16 14:23:45 -0500
+  Days ago: 10
+
+Changes Since Last Release:
+  Files changed: 45
+  Lines added: 2,345
+  Lines removed: 891
+  Total changed: 3,236 lines
+
+Recent Activity:
+  Commits in last 7 days: 15
+
+Current Codebase (tokei):
+  Total lines: 15,234
+  Code: 12,456
+  Comments: 1,890
+  Blanks: 888
+
+Threshold Evaluation:
+  ✓ Lines changed: 3,236 > 3,000 (EXCEEDED)
+  ✓ Days since release: 10 > 7 (EXCEEDED)
+  ✓ Recent activity: 15 commits (ACTIVE)
+
+Version Suggestion:
+  Current: v1.2.3
+  Recommended: v1.3.0 (minor bump - new features detected)
+
+  Detected changes:
+  - 8 feat: commits (new features)
+  - 5 fix: commits (bug fixes)
+  - 2 chore: commits (maintenance)
+
+Recommendation: CREATE RELEASE NOW (default)
+===============================================
+```
+
+## Step 9: Prompt User for Action
+
+Use the AskUserQuestion tool to ask:
+
+**Question**: "Create release now?"
+
+**Options based on thresholds:**
+
+If thresholds exceeded (default: YES):
+- "Yes, create v1.3.0 now" (default)
+- "No, not yet"
+
+If thresholds not met (default: NO):
+- "Yes, create v1.3.0 anyway"
+- "No, wait for more changes" (default)
+
+**Note**: In automated mode, the default is selected automatically.
+
+## Step 10: If User Chooses Yes
+
+Guide them through release creation:
+
+1. **Ask for release notes** (optional):
+   ```
+   What should the release notes include?
+   - Auto-generate from commits
+   - I'll provide custom notes
+   - Skip release notes
+   ```
+
+2. **Create the tag**:
+   ```bash
+   git tag -a v1.3.0 -m "Release v1.3.0
+
+   [Release notes here]
+   "
+   ```
+
+3. **Push the tag**:
+   ```bash
+   git push origin v1.3.0
+   ```
+
+4. **Optional**: Guide creation of GitHub release
+   ```bash
+   gh release create v1.3.0 --generate-notes
+   # or
+   gh release create v1.3.0 --notes "Custom notes"
+   ```
+
+## Important Notes
+
+- Always check recent activity first (commits in last 7 days)
+- Thresholds determine DEFAULT behavior, not absolute rules
+- User can always override and create release anyway
+- In automated CI/CD, default behavior is used
+- Suggest appropriate version bump based on commit messages
+- Handle "no tags" case by recommending v0.1.0
+
+## Error Handling
+
+- If not in a git repository: Error and exit
+- If tokei not found: Continue without tokei statistics
+- If gh CLI not found: Skip GitHub release creation step
+- If no commits ever: "Nothing to release"
+"""
+
 
 class ProjectScaffolder:
     """Create recommended project structure."""
@@ -871,6 +1092,7 @@ See `.standards/` for coding standards and conventions.
             ".claude/commands/ap-trace.md": COMMAND_TRACE,
             ".claude/commands/ap-stamp.md": COMMAND_STAMP,
             ".claude/commands/ap-doc.md": COMMAND_DOC,
+            ".claude/commands/ap-release.md": COMMAND_RELEASE,
         }
 
         for file_path, content in commands.items():
